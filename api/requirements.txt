@@ -1,2 +1,5 @@
-Django>=3.0,<4.0
+Django==3.2.7
 psycopg2-binary>=2.8
+mysqlclient==2.0.3
+djangorestframework==3.12.4
+django-debug-toolbar==3.10.0.2

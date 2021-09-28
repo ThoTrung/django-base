@@ -1,25 +1,3 @@
-### Pipenv 
-    - https://docs.python.org/3/tutorial/venv.html
-    source base_django/bin/activate
-
-
-### Setting DB
-    - https://docs.djangoproject.com/en/3.2/ref/settings/
-
-
-#### Transaction
-
-### Middleware
-
-### Auth
-
-### Custome Exception
-
-
-### Admin
-
-
-
 from polls.models import Album, Track
 from polls.serializers import TrackSerializer, AlbumSerializer
 
@@ -31,6 +9,9 @@ Track.objects.create(album=album, order=3, title='Encore', duration=159)
 album1 = Album.objects.create(album_name="test 1", artist='test1 a')
 Track.objects.create(album=album1, order=4, title='test 2', duration=245)
 
-albums = Album.objects.all()
+albums = Album.objects.all().prefetch_related('tracks')
+tracks = Track.objects.all().prefetch_related('album')
+
+
 serializer = AlbumSerializer(albums, many=True)
 serializer.data
