@@ -3,3 +3,7 @@
 This is the code for the second edition of the course that was released in 2022.
 
 Course code for: [Build a Backend REST API with Python &amp; Django - Advanced](https://londonapp.dev/c2)
+
+
+# Setting github action job
+https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment
