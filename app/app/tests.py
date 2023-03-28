@@ -20,3 +20,8 @@ class CalcTests(SimpleTestCase):
         res = calc.subtract(10, 15)
 
         self.assertEqual(res, 5)
+
+    def test_multi_numbers(self):
+        res = calc.multi(2,3)
+
+        self.assertEqual(res, 6)
