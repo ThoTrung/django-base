@@ -167,5 +167,4 @@ AUDITLOG_EXCLUDE_TRACKING_MODELS = (
     "django.session",
     "django.migrations",
     "django.admin_log",
-    "auditlog.Logentry"
 )

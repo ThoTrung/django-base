@@ -48,13 +48,15 @@ const LoginForm: React.FC = () => {
 	const [isLoading, setIsLoading] = React.useState(false)
 
 	// Initialize form validation with react-hook-form
-	const { control, handleSubmit } = useForm<LoginFormInputs>({
+	const { control, handleSubmit, watch } = useForm<LoginFormInputs>({
 		resolver: yupResolver(validationSchema),
 		defaultValues: {
-			email: 'admin@blueupcode.com',
-			password: 'blueupcodeadmin',
+			email: '',
+			password: '',
 		},
 	})
+
+	console.log(watch('email'));
 
 	// Function to handle form submission
 	const onSubmit = async (formData: LoginFormInputs) => {

@@ -13,8 +13,8 @@ const withAuth = (PageComponent: ExtendedNextPage) => {
 
 	WrapperComponent.getInitialProps = async (ctx: NextPageContext) => {
 		// Get initial properties from page component
+		console.log('PageComponent.getInitialProps', PageComponent.getInitialProps)
 		const initialProps = PageComponent.getInitialProps ? await PageComponent.getInitialProps(ctx) : {}
-
 		// Verify user token from cookie
 		const userData = await authVerifyCookie(ctx)
 

@@ -8,6 +8,6 @@ COPY package.json ./
 RUN addgroup --system --gid 1001 bloggroup
 RUN adduser --system --uid 1001 bloguser
 
-USER bloguser
+# USER bloguser
 
 EXPOSE 3000

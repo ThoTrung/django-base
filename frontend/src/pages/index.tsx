@@ -98,4 +98,5 @@ DashboardPage.breadcrumb = [
 	{ text: "Dashboard", link: "/" },
 ]
 
+// export default DashboardPage
 export default withAuth(DashboardPage)
