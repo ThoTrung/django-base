@@ -13,8 +13,18 @@ import Link from 'next/link'
 import PAGE from 'config/page.config'
 import withGuest from 'components/auth/withGuest'
 import type { ExtendedNextPage } from '@blueupcode/components/types'
+import { incrementAsync, helloSaga } from '../store/sagas/menuSaga'
+
+import axios from "axios";
+const API_URL = "http://localhost:8880/api/token/";
 
 const LoginPage: ExtendedNextPage = () => {
+	axios.post(API_URL, {email: "member1@gmail.com", password: "12345"})
+      .then((response) => {
+				console.log(response);
+        return response
+      });
+
 	return (
 		<Row className="g-0 align-items-center justify-content-center h-100">
 			<Col sm={8} md={6} lg={4} xl={3}>
@@ -64,16 +74,20 @@ const LoginForm: React.FC = () => {
 		setIsLoading(true)
 
 		try {
+			const gen = incrementAsync()
+			console.log(gen.next())
+			console.log(gen.next())
+			console.log(gen.next())
 			// Try to login with email and password
-			await signInWithEmailAndPassword(firebaseAuth, formData.email, formData.password)
+		// 	await signInWithEmailAndPassword(firebaseAuth, formData.email, formData.password)
 
-			const redirectUrl = (Router.query.redirect as string) || PAGE.homePagePath
+		// 	const redirectUrl = (Router.query.redirect as string) || PAGE.homePagePath
 
-			// Redirect to home page or url from the query parameter
-			Router.push(redirectUrl)
+		// 	// Redirect to home page or url from the query parameter
+		// 	Router.push(redirectUrl)
 		} catch (error: any) {
-			// Show alert message when error
-			swal.fire({ text: error.message, icon: 'error' })
+		// 	// Show alert message when error
+		// 	swal.fire({ text: error.message, icon: 'error' })
 		}
 
 		// Hide loading indicator
@@ -147,4 +161,5 @@ interface LoginFormInputs {
 LoginPage.pageTitle = 'Login'
 LoginPage.layoutName = 'blank'
 
-export default withGuest(LoginPage)
+// export default withGuest(LoginPage)
+export default LoginPage

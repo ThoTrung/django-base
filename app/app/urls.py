@@ -24,6 +24,7 @@ from django.conf.urls.static import static
 from django.conf import settings
 
 from core import views as core_views
+from user import views as user_views
 
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -41,6 +42,7 @@ urlpatterns = [
         name='api-docs',
     ),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/login/', user_views.CustomTokenObtainPairView.as_view(), name='user_login'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
     path('api/user/', include('user.urls')),

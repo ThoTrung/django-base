@@ -15,7 +15,7 @@ https://docs.github.com/en/actions/deployment/targeting-different-environments/u
   -X POST \
   -H "Content-Type: application/json" \
   -d '{"email": "member1@gmail.com", "password": "12345"}' \
-  http://localhost:8000/api/token/
+  http://localhost:8880/api/token/
 ```
 
 
