@@ -15,16 +15,16 @@ import withGuest from 'components/auth/withGuest'
 import type { ExtendedNextPage } from '@blueupcode/components/types'
 import { incrementAsync, helloSaga } from '../store/sagas/menuSaga'
 
-import axios from "axios";
-const API_URL = "http://localhost:8880/api/token/";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getPendingSelector,
+  getTodosSelector,
+  getErrorSelector,
+} from "../store/reducers/todo/selectors";
+import { fetchTodoRequest } from "../store/reducers/todo/actions";
+
 
 const LoginPage: ExtendedNextPage = () => {
-	axios.post(API_URL, {email: "member1@gmail.com", password: "12345"})
-      .then((response) => {
-				console.log(response);
-        return response
-      });
-
 	return (
 		<Row className="g-0 align-items-center justify-content-center h-100">
 			<Col sm={8} md={6} lg={4} xl={3}>
@@ -54,6 +54,14 @@ const validationSchema = yup.object().shape({
 })
 
 const LoginForm: React.FC = () => {
+	const dispatch = useDispatch();
+  const todos = useSelector(getTodosSelector);
+	
+	React.useEffect(() => {
+		dispatch(fetchTodoRequest());
+  }, []);
+	
+	console.log('todos',todos);
 	// Loading state
 	const [isLoading, setIsLoading] = React.useState(false)
 
@@ -74,10 +82,10 @@ const LoginForm: React.FC = () => {
 		setIsLoading(true)
 
 		try {
-			const gen = incrementAsync()
-			console.log(gen.next())
-			console.log(gen.next())
-			console.log(gen.next())
+			// const gen = incrementAsync()
+			// console.log(gen.next())
+			// console.log(gen.next())
+			// console.log(gen.next())
 			// Try to login with email and password
 		// 	await signInWithEmailAndPassword(firebaseAuth, formData.email, formData.password)
 
