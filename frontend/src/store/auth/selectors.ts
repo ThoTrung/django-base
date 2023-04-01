@@ -1,6 +1,6 @@
 import { createSelector } from "reselect";
 
-import appReducer, { State } from "../index";
+import appReducer, { State } from "../reducers/index";
 
 const getPending = (state: State) => state.todo.pending;
 

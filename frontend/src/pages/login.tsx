@@ -20,8 +20,8 @@ import {
   getPendingSelector,
   getTodosSelector,
   getErrorSelector,
-} from "../store/reducers/todo/selectors";
-import { fetchTodoRequest } from "../store/reducers/todo/actions";
+} from "../store/auth/selectors";
+import { fetchTodoRequest } from "../store/auth/actions";
 
 
 const LoginPage: ExtendedNextPage = () => {

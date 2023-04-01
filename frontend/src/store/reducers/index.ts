@@ -25,7 +25,7 @@
 
 import { combineReducers } from "redux";
 
-import todoReducer from "./todo/index";
+import todoReducer from "../auth/index";
 
 const rootReducer = combineReducers({
   todo: todoReducer,

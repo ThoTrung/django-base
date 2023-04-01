@@ -1,6 +1,6 @@
 import { takeEvery, all, fork } from 'redux-saga/effects'
 import { separatingActiveLink, helloSaga, watchIncrementAsync } from './menuSaga'
-import todoSaga from "../reducers/todo/sagas";
+import todoSaga from "../auth/sagas";
 
 
 // function* rootSaga() {
