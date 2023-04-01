@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'auditlog',
     # 'simple_history',
+    'himalaya',
     'core',
     'user',
     'recipe',
@@ -96,6 +97,20 @@ DATABASES = {
         'NAME': os.environ.get('DB_NAME'),
         'USER': os.environ.get('DB_USER'),
         'PASSWORD': os.environ.get('DB_PASS'),
+    },
+    'himalaya': {
+        'ENGINE': 'mssql',
+        # 'HOST': os.environ.get('HI_DB_HOST'),
+        # 'PORT': os.environ.get('HI_DB_PORT'),
+        # 'NAME': os.environ.get('HI_DB_NAME'),
+        # 'USER': os.environ.get('HI_DB_USER'),
+        # 'PASSWORD': os.environ.get('HI_DB_PASS'),
+
+        'HOST': 'data.ssoft.vn',
+        'PORT': 1533,
+        'NAME': 'LUCKYBEAUTY_HYMALAYASPA',
+        'USER': 'Lucky',
+        'PASSWORD': 'Lucky123',
     }
 }
 

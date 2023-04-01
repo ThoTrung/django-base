@@ -6,3 +6,5 @@ Pillow>=9.1.0,<9.2
 uwsgi>=2.0.20,<2.1
 djangorestframework-simplejwt==5.2.2
 django-auditlog==2.2.2
+pyodbc==4.0.35
+mssql-django==1.2
