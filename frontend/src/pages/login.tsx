@@ -20,8 +20,10 @@ import {
   getPendingSelector,
   getTodosSelector,
   getErrorSelector,
+	getSLoginPending,
+	getSLoginToken,
 } from "../store/auth/selectors";
-import { fetchTodoRequest } from "../store/auth/actions";
+import { fetchTodoRequest, ALoginRequest } from "../store/auth/actions";
 
 
 const LoginPage: ExtendedNextPage = () => {
@@ -53,15 +55,14 @@ const validationSchema = yup.object().shape({
 	password: yup.string().min(6, 'Please enter at least 6 characters').required('Please provide your password'),
 })
 
-const LoginForm: React.FC = () => {
+const LoginForm: React.FC = (props) => {
+	console.log(props);
 	const dispatch = useDispatch();
-  const todos = useSelector(getTodosSelector);
+  const token = useSelector(getSLoginToken);
+  const pending = useSelector(getSLoginPending);
+
 	
-	React.useEffect(() => {
-		dispatch(fetchTodoRequest());
-  }, []);
-	
-	console.log('todos',todos);
+	// console.log('todos',todos);
 	// Loading state
 	const [isLoading, setIsLoading] = React.useState(false)
 
@@ -69,8 +70,8 @@ const LoginForm: React.FC = () => {
 	const { control, handleSubmit, watch } = useForm<LoginFormInputs>({
 		resolver: yupResolver(validationSchema),
 		defaultValues: {
-			email: '',
-			password: '',
+			email: 'tho.nt@gmail.com',
+			password: '123456',
 		},
 	})
 
@@ -82,13 +83,12 @@ const LoginForm: React.FC = () => {
 		setIsLoading(true)
 
 		try {
-			// const gen = incrementAsync()
-			// console.log(gen.next())
-			// console.log(gen.next())
-			// console.log(gen.next())
+			console.log('On submit');
+			const payload={email: formData.email, password:formData.password};
 			// Try to login with email and password
-		// 	await signInWithEmailAndPassword(firebaseAuth, formData.email, formData.password)
+			dispatch(ALoginRequest(payload)); 
 
+			console.log('Finish login', token)
 		// 	const redirectUrl = (Router.query.redirect as string) || PAGE.homePagePath
 
 		// 	// Redirect to home page or url from the query parameter
@@ -151,8 +151,8 @@ const LoginForm: React.FC = () => {
 				<span>
 					Don&apos;t have an account? <Link href="/register">Register</Link>
 				</span>
-				<Button type="submit" variant="label-primary" size="lg" width="widest" disabled={isLoading}>
-					{isLoading && <Spinner animation="border" size="sm" className="me-2" />}
+				<Button type="submit" variant="label-primary" size="lg" width="widest" disabled={pending}>
+					{pending && <Spinner animation="border" size="sm" className="me-2" />}
 					Login
 				</Button>
 			</div>
@@ -169,5 +169,5 @@ interface LoginFormInputs {
 LoginPage.pageTitle = 'Login'
 LoginPage.layoutName = 'blank'
 
-// export default withGuest(LoginPage)
-export default LoginPage
+export default withGuest(LoginPage)
+// export default LoginPage

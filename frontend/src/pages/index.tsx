@@ -18,8 +18,26 @@ import Widget33 from 'components/widgets/Widget33'
 import Widget34 from 'components/widgets/Widget34'
 import Widget35 from 'components/widgets/Widget35'
 import type { ExtendedNextPage } from '@blueupcode/components/types'
+import Router from 'next/router'
+import PAGE from 'config/page.config'
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getPendingSelector,
+  getTodosSelector,
+  getErrorSelector,
+	getSLoginPending,
+	getSLoginToken,
+} from "../store/auth/selectors";
 
 const DashboardPage: ExtendedNextPage = () => {
+	// const token = useSelector(getSLoginToken);
+	// React.useEffect(() => {
+	// 	console.log('redirect to dashboard', token);
+	// 	if (!token) {
+	// 		const redirectUrl = (Router.query.redirect as string) || PAGE.loginPagePath
+	// 		Router.push(redirectUrl)
+	// 	}
+  // }, [token]);
 	return (
 		<>
 			<Row>
@@ -100,3 +118,4 @@ DashboardPage.breadcrumb = [
 
 // export default DashboardPage
 export default withAuth(DashboardPage)
+// export default withAuth(DashboardPage)

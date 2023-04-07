@@ -1,6 +1,6 @@
 import { createSelector } from "reselect";
 
-import appReducer, { State } from "../reducers/index";
+import reducers, { State } from "../reducers/index";
 
 const getPending = (state: State) => state.todo.pending;
 
@@ -16,3 +16,12 @@ export const getPendingSelector = createSelector(
 );
 
 export const getErrorSelector = createSelector(getError, (error) => error);
+
+
+const getLoginToken = (state: State) => state.login.token;
+const getLoginPending = (state: State) => state.login.pending;
+const getLoginError = (state: State) => state.login.error;
+
+export const getSLoginToken = createSelector(getLoginToken, (token) => token);
+export const getSLoginPending = createSelector(getLoginPending, (pending) => pending);
+export const getSLoginError = createSelector(getLoginError, (error) => error);

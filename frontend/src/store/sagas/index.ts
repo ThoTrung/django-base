@@ -1,6 +1,6 @@
 import { takeEvery, all, fork } from 'redux-saga/effects'
 import { separatingActiveLink, helloSaga, watchIncrementAsync } from './menuSaga'
-import todoSaga from "../auth/sagas";
+import todoSaga, { loginSaga } from "../auth/sagas";
 
 
 // function* rootSaga() {
@@ -8,8 +8,8 @@ import todoSaga from "../auth/sagas";
 // 	yield all([helloSaga(), watchIncrementAsync()])
 // }
 
-export function* rootSaga() {
-  yield all([fork(todoSaga)]);
+function* rootSaga() {
+  yield all([loginSaga()]);
 }
 
 export default rootSaga

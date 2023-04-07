@@ -14,10 +14,15 @@ https://docs.github.com/en/actions/deployment/targeting-different-environments/u
   curl \
   -X POST \
   -H "Content-Type: application/json" \
-  -d '{"email": "member1@gmail.com", "password": "12345"}' \
+  -d '{"email": "tho.nt@gmail.com", "password": "123456"}' \
   http://localhost:8880/api/token/
 ```
 
 
 # Log changed DB
 https://django-auditlog.readthedocs.io/en/latest/usage.html
+
+
+#Clear docker none
+docker rmi $(docker images -a|grep "<none>"|awk '$1=="<none>" {print $3}')
+

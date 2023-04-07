@@ -1,14 +1,59 @@
 import axios from "axios";
 import { all, call, put, takeLatest } from "redux-saga/effects";
+import { parseCookies, setCookie, destroyCookie } from 'nookies'
 
-import { fetchTodoFailure, fetchTodoSuccess } from "./actions";
-import { FETCH_TODO_REQUEST } from "./actionTypes";
-import { ITodo } from "./types";
-\  
-\\\\\
+import {
+  fetchTodoFailure,
+  fetchTodoSuccess,
+  ALoginSuccess,
+  ALoginFailure,
+} from "./actions";
+import { FETCH_TODO_REQUEST, LOGIN_REQUEST, LOGIN_SUCCESS } from "./actionTypes";
+import {
+  ITodo,
+  ILogin,
+  ILoginRequest,
+  ILoginRequestPayload,
+  ILoginSuccess,
+} from "./types";
+import requestInstance from "../request/index"
 
-const getTodos = () =>
+const postLogin = (payload: ILoginRequestPayload) => {
+  console.log('postLogin', payload)
+  return requestInstance.post<ILogin>('api/token/', payload);
+}
+
+function* requestLogin(action: ILoginRequest) {
+  console.log('action', action)
+  try {
+    const res = yield call(postLogin, action.payload);
+    yield put(
+      ALoginSuccess({
+        token: res.data
+      })
+    )
+  } catch(e: any) {
+    console.log(e.message);
+    yield put(
+      ALoginFailure({
+        error: e.message
+      })
+    )
+  }
+}
+
+function* requestLoginSuccess(loginSuccessData: ILoginSuccess) {
+  try {
+    setCookie(null, 'token', JSON.stringify(loginSuccessData.payload.token));
+    // setCookie(null, 'refreshToken', token.refresh);
+  } catch(e: any) {
+    console.log(e.message)
+  }
+}
+
+const getTodos = () => {
   axios.get<ITodo[]>("https://jsonplaceholder.typicode.com/todos");
+}
 
 /*
   Worker Saga: Fired on FETCH_TODO_REQUEST action
@@ -40,4 +85,11 @@ function* todoSaga() {
   yield all([takeLatest(FETCH_TODO_REQUEST, fetchTodoSaga)]);
 }
 
+function* loginSaga() {
+  console.log('loginSaga---');
+  yield all([takeLatest(LOGIN_REQUEST, requestLogin)])
+  yield all([takeLatest(LOGIN_SUCCESS, requestLoginSuccess)])
+}
+
+export { loginSaga };
 export default todoSaga;
