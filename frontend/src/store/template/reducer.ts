@@ -1,12 +1,18 @@
+// import { AnyAction } from 'redux';
 import { parseCookies, setCookie, destroyCookie } from 'nookies'
+
 import {
+  FETCH_TODO_REQUEST,
+  FETCH_TODO_SUCCESS,
+  FETCH_TODO_FAILURE,
   LOGIN_REQUEST,
   LOGIN_SUCCESS,
   LOGIN_FAILURE,
 } from "./actionTypes";
 
 import {
-  TLoginAction, ILoginState
+  TodoActions, TodoState,
+  TLoginAction, ILoginState, ILogin
 } from "./types";
 // import { UserInfo } from 'firebase-admin/lib/auth/user-record';
 
@@ -22,6 +28,12 @@ const initLoginState: ILoginState = {
   token: token,
   error: null,
 }
+
+const initialState: TodoState = {
+  pending: false,
+  todos: [],
+  error: null,
+};
 
 const loginReducer = (state=initLoginState, action: TLoginAction) => {
   switch(action.type) {
@@ -53,6 +65,40 @@ const loginReducer = (state=initLoginState, action: TLoginAction) => {
       }
   }
 }
+
+const todoReducer = (state = initialState, action: TodoActions) => {
+  switch (action.type) {
+    case FETCH_TODO_REQUEST:
+      console.log('FETCH_TODO_REQUEST');
+      return {
+        ...state,
+        pending: true,
+      };
+    case FETCH_TODO_SUCCESS:
+      console.log('FETCH_TODO_SUCCESS');
+      return {
+        ...state,
+        pending: false,
+        todos: action.payload.todos,
+        error: null,
+      };
+    case FETCH_TODO_FAILURE:
+      console.log('FETCH_TODO_FAILURE');
+      return {
+        ...state,
+        pending: false,
+        todos: [],
+        error: action.payload.error,
+      };
+    default:
+      return {
+        ...state,
+      };
+  }
+};
+
+
+
 // const layoutUserReducer = (state: UserInfo = UserInfoInitState, action: AnyAction) => {
 //   switch (action.type) {
 //     case `GET_USER_INFO`:
@@ -62,4 +108,5 @@ const loginReducer = (state=initLoginState, action: TLoginAction) => {
 //   }
 // }
 
-export default loginReducer;
+export { loginReducer };
+export default todoReducer;

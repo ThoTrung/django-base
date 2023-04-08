@@ -17,13 +17,10 @@ import { incrementAsync, helloSaga } from '../store/sagas/menuSaga'
 
 import { useDispatch, useSelector } from "react-redux";
 import {
-  getPendingSelector,
-  getTodosSelector,
-  getErrorSelector,
 	getSLoginPending,
 	getSLoginToken,
 } from "../store/auth/selectors";
-import { fetchTodoRequest, ALoginRequest } from "../store/auth/actions";
+import { ALoginRequest } from "../store/auth/actions";
 
 
 const LoginPage: ExtendedNextPage = () => {

@@ -10,7 +10,7 @@ const PAGE: PAGE_INTERFACE = {
 	appName: 'Upmin',
 	favicon: '/images/favicon.ico',
 	enableContainerFluid: true,
-	defaultLayoutName: 'default',
+	defaultLayoutName: 'custom',
 	defaultDirection: 'ltr',
 	menuLinkSeparator: '.',
 	loginPagePath: '/login',

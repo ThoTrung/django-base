@@ -4,8 +4,10 @@ import menuReducer, { MenuReducerState } from './menuReducer'
 import offcanvasReducer, { OffcanvasReducerState } from './offcanvasReducer'
 import breadcrumbReducer, { BreadcrumbReducerState } from './breadcrumbReducer'
 import pageReducer, { PageReducerState } from './pageReducer'
-import todoReducer, { loginReducer } from "../auth/reducer";
-import { TodoState, ILoginState } from "../auth/types";
+import loginReducer from "../auth/reducer";
+import { ILoginState } from "../auth/types";
+import myInfoReducer from 'store/myInfo/reducers';
+import { IState as IMyInfoState } from 'store/myInfo/types'
 
 export interface State {
 	layout: LayoutReducerState,
@@ -13,8 +15,8 @@ export interface State {
 	offcanvas: OffcanvasReducerState,
 	menu: MenuReducerState,
 	page: PageReducerState,
-  todo: TodoState,
-  login: ILoginState
+  login: ILoginState,
+	myInfo: IMyInfoState,
 }
 
 const reducers = combineReducers({
@@ -23,8 +25,8 @@ const reducers = combineReducers({
 	offcanvas: offcanvasReducer,
 	menu: menuReducer,
 	page: pageReducer,
-  todo: todoReducer,
   login: loginReducer,
+	myInfo: myInfoReducer,
 })
 
 export type AppState = ReturnType<typeof reducers>;

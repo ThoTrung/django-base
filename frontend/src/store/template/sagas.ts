@@ -1,16 +1,21 @@
+import axios from "axios";
 import { all, call, put, takeLatest } from "redux-saga/effects";
 import { parseCookies, setCookie, destroyCookie } from 'nookies'
-import {LOGIN_REQUEST, LOGIN_SUCCESS } from "./actionTypes";
+
 import {
+  fetchTodoFailure,
+  fetchTodoSuccess,
+  ALoginSuccess,
+  ALoginFailure,
+} from "./actions";
+import { FETCH_TODO_REQUEST, LOGIN_REQUEST, LOGIN_SUCCESS } from "./actionTypes";
+import {
+  ITodo,
   ILogin,
   ILoginRequest,
   ILoginRequestPayload,
   ILoginSuccess,
 } from "./types";
-import {
-  ALoginSuccess,
-  ALoginFailure,
-} from "./actions";
 import requestInstance from "../request/index"
 
 const postLogin = (payload: ILoginRequestPayload) => {
@@ -40,9 +45,44 @@ function* requestLogin(action: ILoginRequest) {
 function* requestLoginSuccess(loginSuccessData: ILoginSuccess) {
   try {
     setCookie(null, 'token', JSON.stringify(loginSuccessData.payload.token));
+    // setCookie(null, 'refreshToken', token.refresh);
   } catch(e: any) {
     console.log(e.message)
   }
+}
+
+const getTodos = () => {
+  axios.get<ITodo[]>("https://jsonplaceholder.typicode.com/todos");
+}
+
+/*
+  Worker Saga: Fired on FETCH_TODO_REQUEST action
+*/
+function* fetchTodoSaga() {
+  console.log('fetchTodoSaga');
+  try {
+    const response = yield call(getTodos);
+    yield put(
+      fetchTodoSuccess({
+        todos: response.data,
+      })
+    );
+  } catch (e: any) {
+    yield put(
+      fetchTodoFailure({
+        error: e.message,
+      })
+    );
+  }
+}
+
+/*
+  Starts worker saga on latest dispatched `FETCH_TODO_REQUEST` action.
+  Allows concurrent increments.
+*/
+function* todoSaga() {
+  console.log('todoSaga---')
+  yield all([takeLatest(FETCH_TODO_REQUEST, fetchTodoSaga)]);
 }
 
 function* loginSaga() {
@@ -51,4 +91,5 @@ function* loginSaga() {
   yield all([takeLatest(LOGIN_SUCCESS, requestLoginSuccess)])
 }
 
-export default loginSaga;
+export { loginSaga };
+export default todoSaga;

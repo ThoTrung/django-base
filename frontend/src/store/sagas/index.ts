@@ -1,6 +1,7 @@
 import { takeEvery, all, fork } from 'redux-saga/effects'
 import { separatingActiveLink, helloSaga, watchIncrementAsync } from './menuSaga'
-import todoSaga, { loginSaga } from "../auth/sagas";
+import loginSaga from "../auth/sagas";
+import myInfoSaga from 'store/myInfo/sagas';
 
 
 // function* rootSaga() {
@@ -9,7 +10,7 @@ import todoSaga, { loginSaga } from "../auth/sagas";
 // }
 
 function* rootSaga() {
-  yield all([loginSaga()]);
+  yield all([loginSaga(), myInfoSaga()]);
 }
 
 export default rootSaga

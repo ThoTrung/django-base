@@ -9,17 +9,22 @@ import {
 	getSLoginToken,
 } from '../../store/auth/selectors';
 
+import { AMyInfoRequest } from 'store/myInfo/actions'
+
 const withAuth = (PageComponent: ExtendedNextPage) => {
 	// Initialize wrapper component
 	const WrapperComponent: ExtendedNextPage = (props) => {
 		const token = useSelector(getSLoginToken);
+		const dispatch = useDispatch();
+
 		React.useEffect(() => {
 			if (!token) {
 				return Router.push(PAGE.loginPagePath)
 			}
 
-			// Check token and get user info
-			
+			// Check token and get my info
+			console.log('dispatch(AMyInfoRequest())');
+			dispatch(AMyInfoRequest())
 		},[token]);
 		return <PageComponent {...props} />
 	}
