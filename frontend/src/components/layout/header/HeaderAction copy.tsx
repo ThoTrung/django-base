@@ -5,7 +5,7 @@ import LayoutHeaderActionToggle from './HeaderActionToggle'
 const LayoutHeaderAction: React.FC = () => {
   return (
     <>
-      {/* <LayoutHeaderActionToggle /> */}
+      <LayoutHeaderActionToggle />
       <LayoutHeaderActionFullscreen />
     </>
   )

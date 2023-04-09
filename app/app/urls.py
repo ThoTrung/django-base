@@ -47,6 +47,7 @@ urlpatterns = [
     path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
     path('api/user/', include('user.urls')),
     path('api/recipe/', include('recipe.urls')),
+    path('api/job-managers/', include('job_manager.urls')),
 ]
 
 if settings.DEBUG:

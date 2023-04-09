@@ -53,6 +53,8 @@ INSTALLED_APPS = [
     'core',
     'user',
     'recipe',
+    'job_manager',
+    'django_celery_beat',
 ]
 
 MIDDLEWARE = [
@@ -177,3 +179,8 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 }
 
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+CELERY_BROKER_URL = "redis://redis:6379"
+CELERY_RESULT_BACKEND = "redis://redis:6379"
+CELERY_TIMEZONE = "Asia/Ho_Chi_Minh"

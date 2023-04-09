@@ -1,6 +1,6 @@
 import React from 'react'
 import withAuth from 'components/auth/withAuth'
-import { Row, Col } from '@blueupcode/components'
+import { Row, Col, Portlet, Form, Button, InputGroup } from '@blueupcode/components'
 import Widget3 from 'components/widgets/Widget3'
 import Widget7 from 'components/widgets/Widget7'
 import Widget10 from 'components/widgets/Widget10'
@@ -20,23 +20,27 @@ import Widget35 from 'components/widgets/Widget35'
 import type { ExtendedNextPage } from '@blueupcode/components/types'
 import Router from 'next/router'
 import PAGE from 'config/page.config'
-import { useDispatch, useSelector } from "react-redux";
-import {
-	getSLoginPending,
-	getSLoginToken,
-} from "../store/auth/selectors";
+
 
 const DashboardPage: ExtendedNextPage = () => {
 	return (
 		<>
+			<Form.Group as={Row} controlId="colFormLabelLg">
+				<Form.Label column sm={2}>
+					Email
+				</Form.Label>
+				<Col sm={10}>
+					<Form.Control type="email" placeholder="col-form-label-lg" />
+				</Col>
+			</Form.Group>
 		</>
 	)
 }
 
-DashboardPage.pageTitle = 'Dashboard'
-DashboardPage.activeLink = 'dashboard'
+DashboardPage.pageTitle = 'Thông tin cloud'
+DashboardPage.activeLink = 'cloud_info'
 DashboardPage.breadcrumb = [
-	{ text: "Dashboard", link: "/" },
+	{ text: "Thông tin cloud", link: "/" },
 ]
 
 export default withAuth(DashboardPage)

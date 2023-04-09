@@ -29,7 +29,7 @@ import {
 	getSLoginToken,
 } from "../store/auth/selectors";
 
-const DashboardPage: ExtendedNextPage = () => {
+const ThoPage: ExtendedNextPage = () => {
 	// const token = useSelector(getSLoginToken);
 	// React.useEffect(() => {
 	// 	console.log('redirect to dashboard', token);
@@ -110,12 +110,12 @@ const DashboardPage: ExtendedNextPage = () => {
 	)
 }
 
-DashboardPage.pageTitle = 'Dashboard'
-DashboardPage.activeLink = 'dashboard'
-DashboardPage.breadcrumb = [
+ThoPage.pageTitle = 'Dashboard'
+ThoPage.activeLink = 'dashboard'
+ThoPage.breadcrumb = [
 	{ text: "Dashboard", link: "/" },
 ]
 
-// export default DashboardPage
-export default withAuth(DashboardPage)
-// export default withAuth(DashboardPage)
+// export default ThoPage
+export default withAuth(ThoPage)
+// export default withAuth(ThoPage)

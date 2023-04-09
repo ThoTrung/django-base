@@ -23,10 +23,8 @@ const LayoutHeader: React.FC<LayoutHeaderProps> = (props) => {
 				{/* BEGIN Header Holder */}
 				<Header.Holder shown="desktop">
 					<Header.Container fluid={PAGE.enableContainerFluid} className="g-4">
-						<Header.Title>{props.pageTitle}</Header.Title>
-						<Header.Divider />
-						<Header.Wrap block justify="start">
-							<LayoutHeaderBreadcrumb />
+						<Header.Wrap justify="start" block>
+							<LayoutHeaderNav />
 						</Header.Wrap>
 						<Header.Wrap className="hstack gap-2">
 							<LayoutHeaderNotification variant="flat-primary" />
@@ -38,14 +36,13 @@ const LayoutHeader: React.FC<LayoutHeaderProps> = (props) => {
 								<FontAwesomeIcon icon={faCalendarAlt} />
 							</Button>
 							<LayoutHeaderUser variant="flat-primary" />
-							<LayoutHeaderAction />
 						</Header.Wrap>
 					</Header.Container>
 				</Header.Holder>
 				{/* END Header Holder */}
 			</Sticky>
 			{/* BEGIN Header Holder */}
-			{/* <Header.Holder shown="desktop">
+			<Header.Holder shown="desktop">
 				<Header.Container fluid={PAGE.enableContainerFluid} className="g-4">
 					<Header.Title>{props.pageTitle}</Header.Title>
 					<Header.Divider />
@@ -56,10 +53,10 @@ const LayoutHeader: React.FC<LayoutHeaderProps> = (props) => {
 						<LayoutHeaderAction />
 					</Header.Wrap>
 				</Header.Container>
-			</Header.Holder> */}
+			</Header.Holder>
 			{/* END Header Holder */}
 			{/* BEGIN Header Holder */}
-			{/* <Sticky top={0} bottomBoundary={0} className="sticky-header">
+			<Sticky top={0} bottomBoundary={0} className="sticky-header">
 				<Header.Holder shown="mobile">
 					<Header.Container fluid={PAGE.enableContainerFluid} className="g-4">
 						<Header.Wrap>
@@ -78,16 +75,16 @@ const LayoutHeader: React.FC<LayoutHeaderProps> = (props) => {
 						</Header.Wrap>
 					</Header.Container>
 				</Header.Holder>
-			</Sticky> */}
+			</Sticky>
 			{/* END Header Holder */}
 			{/* BEGIN Header Holder */}
-			{/* <Header.Holder shown="mobile">
+			<Header.Holder shown="mobile">
 				<Header.Container fluid={PAGE.enableContainerFluid} className="g-4">
 					<Header.Wrap block justify="start" className="w-100">
 						<LayoutHeaderBreadcrumb />
 					</Header.Wrap>
 				</Header.Container>
-			</Header.Holder> */}
+			</Header.Holder>
 			{/* END Header Holder */}
 		</Header>
 	)

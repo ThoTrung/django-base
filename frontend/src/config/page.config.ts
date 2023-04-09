@@ -7,7 +7,7 @@ import { LayoutNames } from 'components/layout/getLayout'
  */
 
 const PAGE: PAGE_INTERFACE = {
-	appName: 'Upmin',
+	appName: 'Job Manager',
 	favicon: '/images/favicon.ico',
 	enableContainerFluid: true,
 	defaultLayoutName: 'custom',
