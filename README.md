@@ -26,3 +26,5 @@ https://django-auditlog.readthedocs.io/en/latest/usage.html
 #Clear docker none
 docker rmi $(docker images -a|grep "<none>"|awk '$1=="<none>" {print $3}')
 
+# Theme 
+https://upmin-react.blueupcode.com/

@@ -20,17 +20,50 @@ import Widget35 from 'components/widgets/Widget35'
 import type { ExtendedNextPage } from '@blueupcode/components/types'
 import Router from 'next/router'
 import PAGE from 'config/page.config'
+import DateTimePicker from 'react-datetime'
 
+// https://upmin-react.blueupcode.com/
 
 const DashboardPage: ExtendedNextPage = () => {
 	return (
 		<>
 			<Form.Group as={Row} controlId="colFormLabelLg">
-				<Form.Label column sm={2}>
-					Email
-				</Form.Label>
-				<Col sm={10}>
-					<Form.Control type="email" placeholder="col-form-label-lg" />
+				<Col sm={12} className='d-flex flex-row'>
+					<Form.Label column className='miw-60'>
+						Dropbox:
+					</Form.Label>
+					<Form.Label column className='ps-3 miw-90'>
+						E:\Dropbox\
+					</Form.Label>
+					<Form.Control placeholder="Your path" className='ms-1' />
+					<Button variant={'primary'} className="ms-3 text-nowrap miw-80">
+						Thay đổi
+					</Button>{' '}
+				</Col>
+				<Col sm={12} className='d-flex flex-row mt-3'>
+					<Form.Label column className='miw-60'>
+						Driver:
+					</Form.Label>
+					<Form.Label column className='ps-3 miw-90'>
+						E:\MyDrive\
+					</Form.Label>
+					<Form.Control placeholder="Your path" className='ms-1' />
+					<Button variant={'primary'} className="ms-3 text-nowrap miw-80">
+						Thay đổi
+					</Button>{' '}
+				</Col>
+				<Col sm={12} className='d-flex flex-row mt-3'>
+					<Form.Label column className='me-3 maw-140'>
+						Thời gian bắt đầu
+					</Form.Label>
+					<DateTimePicker closeOnSelect />
+					<Form.Label column className='ms-5 me-3 maw-140'>
+						Thời gian kết thúc
+					</Form.Label>
+					<DateTimePicker closeOnSelect />
+					<Button variant={'success'} className="ms-3 text-nowrap miw-80">
+						Tìm kiếm
+					</Button>{' '}
 				</Col>
 			</Form.Group>
 		</>

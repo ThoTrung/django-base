@@ -6,6 +6,7 @@ import 'styles/vendor/quill/snow.scss'
 import 'styles/vendor/quill/bubble.scss'
 import 'styles/vendor/datetime/datetime.scss'
 import 'styles/vendor/sweetalert2/sweetalert2.scss'
+import 'styles/custom/index.scss'
 
 import { SSRProvider, DirectionProvider, ThemeProvider } from '@blueupcode/components'
 import { AuthProvider } from 'components/auth/authContext'
