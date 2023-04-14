@@ -18,13 +18,11 @@ const withAuth = (PageComponent: ExtendedNextPage) => {
 		const dispatch = useDispatch();
 
 		React.useEffect(() => {
-			if (!token) {
-				return Router.push(PAGE.loginPagePath)
-			}
-
-			// Check token and get my info
-			console.log('dispatch(AMyInfoRequest())');
-			dispatch(AMyInfoRequest())
+		if (!token) {
+			return Router.push(PAGE.loginPagePath)
+		}
+		// Check token and get my info
+		dispatch(AMyInfoRequest())
 		},[token]);
 		return <PageComponent {...props} />
 	}

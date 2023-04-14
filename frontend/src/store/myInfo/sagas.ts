@@ -1,7 +1,7 @@
 import { all, call, put, takeLatest } from "redux-saga/effects";
 import { IMyInfo } from "./types"
 import { GET_MYINFO_REQUEST } from "./actionTypes";
-import requestInstance from "../request/index"
+import requestInstance from "../request/base"
 import { AMyInfoFailure, AMyInfoSuccess } from "./actions";
 
 

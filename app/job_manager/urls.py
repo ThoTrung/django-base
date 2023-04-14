@@ -12,4 +12,7 @@ router.register('', views.JobManagerViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('list-folder-from-disk', views.ListFolderFromDiskView.as_view()),
+    path('user-setting-job', views.UserSettingJobViewGet.as_view()),
+    path('user-setting-job/<key>', views.UserSettingJobViewPut.as_view()),
 ]

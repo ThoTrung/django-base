@@ -11,7 +11,7 @@ import {
   ALoginSuccess,
   ALoginFailure,
 } from "./actions";
-import requestInstance from "../request/index"
+import requestInstance from "../request/base"
 
 const postLogin = (payload: ILoginRequestPayload) => {
   console.log('postLogin', payload)

@@ -1,6 +1,8 @@
 import React from 'react'
+import Moment from 'moment';
+import { GetStaticProps, GetStaticPaths, GetServerSideProps } from 'next'
 import withAuth from 'components/auth/withAuth'
-import { Row, Col, Portlet, Form, Button, InputGroup } from '@blueupcode/components'
+import { Row, Col, Portlet, Form, Button, InputGroup, Table, Spinner } from '@blueupcode/components'
 import Widget3 from 'components/widgets/Widget3'
 import Widget7 from 'components/widgets/Widget7'
 import Widget10 from 'components/widgets/Widget10'
@@ -21,10 +23,52 @@ import type { ExtendedNextPage } from '@blueupcode/components/types'
 import Router from 'next/router'
 import PAGE from 'config/page.config'
 import DateTimePicker from 'react-datetime'
+import { string } from 'prop-types'
+import { listFolderFromDisk, IListFolderFromDisk, IOneFolder } from 'store/request/job_manager'
 
 // https://upmin-react.blueupcode.com/
 
-const DashboardPage: ExtendedNextPage = () => {
+interface aa {
+	lastModifiedFolder: string;
+	files: string[],
+}
+interface Prop {
+	[key: string]: aa[]
+}
+
+const DashboardPage: ExtendedNextPage = (props) => {
+	const [driverPath, setDriverPath] = React.useState<string>('');
+	const [isEditingDriverPath, setIsEditingDriverPath] = React.useState<boolean>(false);
+	const [dropboxPath, setDropboxPath] = React.useState<string>('');
+	const [isEditingDropboxPath, setIsEditingDropboxPath] = React.useState<boolean>(false);
+	const [startTime, setStartTime] = React.useState<string>('');
+	const [endTime, setEndTime] = React.useState<string>('');
+	const [loading, setLoading] = React.useState<boolean>(false);
+	const [data, setData] = React.useState<IOneFolder[]>();
+
+	const filter = async () => {
+		setLoading(true);
+		const res = await listFolderFromDisk({
+			driverPath,
+			dropboxPath,
+			startTime: startTime ? startTime.format('YYYY-MM-DD h:mm') : '',
+			endTime: endTime ? endTime.format('YYYY-MM-DD h:mm') : '',
+		})
+		setLoading(false);
+		if (res.status === 200) {
+			console.log(res.data, res.status);
+			setData(res.data.data);
+		}
+	}
+
+	const toggleEditingDriverPath = () => {
+		setIsEditingDriverPath(!isEditingDriverPath);
+	}
+	const toggleEditingDropboxPath = () => {
+		setIsEditingDropboxPath(!isEditingDropboxPath);
+	}
+
+	console.log('props',props)
 	return (
 		<>
 			<Form.Group as={Row} controlId="colFormLabelLg">
@@ -35,11 +79,17 @@ const DashboardPage: ExtendedNextPage = () => {
 					<Form.Label column className='ps-3 miw-90'>
 						E:\Dropbox\
 					</Form.Label>
-					<Form.Control placeholder="Your path" className='ms-1' />
-					<Button variant={'primary'} className="ms-3 text-nowrap miw-80">
-						Thay đổi
+					<Form.Control
+						placeholder="Your Driver path"
+						className='ms-1'
+						disabled={!isEditingDriverPath}
+						onChange={e => setDriverPath(e.target.value)}
+					/>
+					<Button variant={'primary'} onClick={toggleEditingDriverPath} className="ms-3 text-nowrap miw-80">
+					{isEditingDriverPath ? 'Lưu' : 'Thay đổi'}
 					</Button>{' '}
 				</Col>
+
 				<Col sm={12} className='d-flex flex-row mt-3'>
 					<Form.Label column className='miw-60'>
 						Driver:
@@ -47,27 +97,85 @@ const DashboardPage: ExtendedNextPage = () => {
 					<Form.Label column className='ps-3 miw-90'>
 						E:\MyDrive\
 					</Form.Label>
-					<Form.Control placeholder="Your path" className='ms-1' />
-					<Button variant={'primary'} className="ms-3 text-nowrap miw-80">
-						Thay đổi
+					<Form.Control
+						placeholder="Your Dropbox path"
+						className='ms-1'
+						disabled={!isEditingDropboxPath}
+						onChange={e => setDropboxPath(e.target.value)}
+					/>
+					<Button variant={'primary'} onClick={toggleEditingDropboxPath} className="ms-3 text-nowrap miw-80">
+						{isEditingDropboxPath ? 'Lưu' : 'Thay đổi'}
 					</Button>{' '}
 				</Col>
+
 				<Col sm={12} className='d-flex flex-row mt-3'>
 					<Form.Label column className='me-3 maw-140'>
 						Thời gian bắt đầu
 					</Form.Label>
-					<DateTimePicker closeOnSelect />
+					<DateTimePicker
+						closeOnSelect
+						dateFormat="YYYY-MM-DD"
+						timeFormat="hh:mm a"
+						onChange={e => setStartTime(e)}
+					/>
 					<Form.Label column className='ms-5 me-3 maw-140'>
 						Thời gian kết thúc
 					</Form.Label>
-					<DateTimePicker closeOnSelect />
-					<Button variant={'success'} className="ms-3 text-nowrap miw-80">
+					<DateTimePicker
+						closeOnSelect
+						dateFormat="YYYY-MM-DD"
+						timeFormat="hh:mm a"
+						onChange={e => setEndTime(e)}
+					/>
+					<Button
+						variant={'success'}
+						className="ms-3 text-nowrap miw-80"
+						onClick={filter}
+						disabled={loading}
+					>
+						{loading && <Spinner animation="border" size="sm" className="me-2" />}
 						Tìm kiếm
 					</Button>{' '}
 				</Col>
 			</Form.Group>
+			{loading ? (
+				<div className='align-middle text-center mt-5'>
+					<Spinner animation="border" size="sm" style={{ height: '3rem', width: '3rem' }} className="me-2" />
+				</div>
+				) : (
+					<Table bordered striped hover className='mt-4'>
+						<thead className='table-primary'>
+							<tr>
+								<th scope="col" className='w-30'>#</th>
+								<th scope="col" className=''>Thư mục</th>
+								<th scope="col" className='w-130'>Thời gian cập nhật</th>
+								<th scope="col" className='w-30'>Số file</th>
+							</tr>
+						</thead>
+						<tbody>
+							{data && data?.length > 0 ? (
+								data.map((item, idx) => (
+									<tr key={idx + 1}>
+										<th scope="row">{idx + 1}</th>
+										<td>{item.path}</td>
+										<td>{item.lastModifiedFolder}</td>
+										<td>{item.files ? item.files.length : 0}</td>
+									</tr>
+								))
+							) : (
+								<div className='w-130'>Không có data.</div>
+							)}
+						</tbody>
+					</Table>
+				)}
 		</>
 	)
+}
+
+export const getStaticProps: GetStaticProps = async (context) => {
+  return {
+    props: {a:11}, // will be passed to the page component as props
+  }
 }
 
 DashboardPage.pageTitle = 'Thông tin cloud'

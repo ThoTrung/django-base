@@ -24,6 +24,7 @@ services:
         - DEV=true
     ports:
       - "8000:8000"
+    restart: always
     volumes:
       - ./app:/app
       - dev-static-data:/vol/web

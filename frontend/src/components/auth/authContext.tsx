@@ -51,15 +51,15 @@ export const AuthProvider: React.FC = ({ children }) => {
 
 	React.useEffect(() => {
 		// Set timer for refreshing user token
-		const interval = setInterval(async () => {
-			const user = firebaseAuth.currentUser
+		// const interval = setInterval(async () => {
+		// 	const user = firebaseAuth.currentUser
 
-			// Forced refresh user token
-			if (user) await user.getIdToken(true)
-		}, refreshTokenIn)
+		// 	// Forced refresh user token
+		// 	if (user) await user.getIdToken(true)
+		// }, refreshTokenIn)
 
-		// Clear timer
-		return () => clearInterval(interval)
+		// // Clear timer
+		// return () => clearInterval(interval)
 	}, [])
 
 	return <AuthContext.Provider value={{ userData, setUserData }}>{children}</AuthContext.Provider>

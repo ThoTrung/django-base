@@ -2,7 +2,7 @@ import { put, PutEffect, select, SelectEffect, takeEvery } from 'redux-saga/effe
 import { menuActiveLinkPartialChange } from 'store/actions'
 import { State } from 'store/reducers'
 import PAGE from 'config/page.config'
-import requestInstance from '../request/index'
+import requestInstance from '../request/base'
 
 export const delay = (ms:number) => new Promise(res => setTimeout(res, ms))
 

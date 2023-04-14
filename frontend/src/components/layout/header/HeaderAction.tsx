@@ -1,11 +1,11 @@
 import React from 'react'
 import LayoutHeaderActionFullscreen from './HeaderActionFullscreen'
-import LayoutHeaderActionToggle from './HeaderActionToggle'
+import LayoutHeaderActionToggleTheme from './HeaderActionToggleTheme'
 
 const LayoutHeaderAction: React.FC = () => {
   return (
     <>
-      {/* <LayoutHeaderActionToggle /> */}
+      <LayoutHeaderActionToggleTheme />
       <LayoutHeaderActionFullscreen />
     </>
   )

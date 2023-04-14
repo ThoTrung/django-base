@@ -15,6 +15,6 @@ class Command(BaseCommand):
         ])
 
         UserSettingJob.objects.bulk_create([
-            UserSettingJob(key='driver', value='/LocalDrive'),
-            UserSettingJob(key='dropbox', value='/LocalDropbox'),
+            UserSettingJob(key='driver', value=''),
+            UserSettingJob(key='dropbox', value=''),
         ])
