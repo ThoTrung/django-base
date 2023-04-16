@@ -40,6 +40,7 @@ services:
       - DB_USER=${DB_USER}
       - DB_PASS=${DB_PASS}
       - DEBUG=1
+      - ALLOWED_HOST=${ALLOWED_HOST}
     depends_on:
       - db
   
@@ -69,6 +70,9 @@ services:
       - ./frontend:/app
     ports:
       - "3000:3000"
+    environment:
+      - API_URL=${API_URL}
+
 
   nginx:
     depends_on:

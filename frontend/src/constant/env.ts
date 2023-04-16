@@ -5,7 +5,8 @@ export const showLogger = isLocal
   ? true
   : process.env.NEXT_PUBLIC_SHOW_LOGGER === 'true' ?? false;
 
-export const apiUrl = process.env.API_URL ?? "http://localhost:8880/"
+export const apiUrl = process.env.API_URL
+console.log('apiUrl', apiUrl)
 
 export const breakPoint = {
   sm: 640,
