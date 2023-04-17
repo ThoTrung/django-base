@@ -13,7 +13,24 @@ export interface IOneFolder {
   files: string[];
 }
 
+export interface ISettingSearchFolder {
+  subkey: string;
+  value: string;
+}
+
 export const listFolderFromDisk = async (params: IListFolderFromDisk) => {
   const res = await requestInstance.get('api/job-managers/list-folder-from-disk', {params});
+  return res;
+}
+
+
+export const getSearchFolderSetting = () => {
+  const res = requestInstance.get('api/job-managers/search-folder-setting', {});
+  return res;
+}
+
+
+export const putSearchFolderSetting = async (params: ISettingSearchFolder) => {
+  const res = await requestInstance.put('api/job-managers/search-folder-setting', params);
   return res;
 }

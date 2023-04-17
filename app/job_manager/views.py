@@ -11,7 +11,7 @@ from rest_framework import (
     mixins,
     status,
 )
-import pathlib 
+import pathlib
 from rest_framework.views import APIView
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -32,29 +32,30 @@ class JobManagerViewSet(viewsets.ModelViewSet):
 
 
     # permission_classes = [IsAuthenticated]
-
 class ListFolderFromDiskView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def _getListFileFromFolder(self, folderPath, startTime, endTime):
+    def _getListFileFromFolder(self, folderPath, startTime, endTime, ignoreFolders):
         folderPathObj = pathlib.Path(folderPath)
         res = {}
         for file in folderPathObj.rglob("*.*"):
-            lastModifiedTimeOfFile = datetime.fromtimestamp(file.lstat().st_mtime).strftime('%Y-%m-%d %H:%M')
-            if (not startTime or lastModifiedTimeOfFile >= startTime) \
-                and (not endTime or lastModifiedTimeOfFile <= endTime):
+            intersectionFolders = ignoreFolders.intersection(file.parents[0].parts)
+            if len(intersectionFolders) == 0:
+                lastModifiedTimeOfFile = datetime.fromtimestamp(file.lstat().st_mtime).strftime('%Y-%m-%d %H:%M')
+                if (not startTime or lastModifiedTimeOfFile >= startTime) \
+                    and (not endTime or lastModifiedTimeOfFile <= endTime):
 
-                folderPath = str(file.parents[0].resolve())
-                if folderPath not in res:
-                    res[folderPath] = {
-                        'files': [],
-                        'lastModifiedFolder': '',
-                        'path': folderPath
-                    }
-                res[folderPath]['files'].append(str(file.resolve()))
+                    folderPath = str(file.parents[0].resolve())
+                    if folderPath not in res:
+                        res[folderPath] = {
+                            'files': [],
+                            'lastModifiedFolder': '',
+                            'path': folderPath
+                        }
+                    res[folderPath]['files'].append(str(file.resolve()))
 
-                if lastModifiedTimeOfFile > res[folderPath]['lastModifiedFolder']:
-                    res[folderPath]['lastModifiedFolder'] = lastModifiedTimeOfFile
+                    if lastModifiedTimeOfFile > res[folderPath]['lastModifiedFolder']:
+                        res[folderPath]['lastModifiedFolder'] = lastModifiedTimeOfFile
 
         return list(res.values())
 
@@ -66,32 +67,34 @@ class ListFolderFromDiskView(APIView):
         DRIVER_FOLDER = '/LocalDrive/'
         DROPBOX_FOLDER = '/LocalDropbox/'
 
-        driverFolderPath = DRIVER_FOLDER + request.query_params.get('driverPath', '')
-        dropboxFolderPath = DROPBOX_FOLDER + request.query_params.get('dropboxPath', '')
+        ignoreFolderSetting = UserSettingJob.objects.filter(key='ignore_folder').get()
+        ignoreFolders = set(ignoreFolderSetting.value['folders'])
+        searchFolderSetting = UserSettingJob.objects.filter(key='search_folder').get()
+        driverFolderPath = DRIVER_FOLDER + searchFolderSetting.value['driver']
+        dropboxFolderPath = DROPBOX_FOLDER + searchFolderSetting.value['dropbox']
         startTime = request.query_params.get('startTime', None)
         endTime = request.query_params.get('endTime', None)
 
-        driverListFiles = self._getListFileFromFolder(driverFolderPath, startTime, endTime)
-        dropboxListFiles = self._getListFileFromFolder(dropboxFolderPath, startTime, endTime)
+        driverListFiles = self._getListFileFromFolder(driverFolderPath, startTime, endTime, ignoreFolders)
+        dropboxListFiles = self._getListFileFromFolder(dropboxFolderPath, startTime, endTime, ignoreFolders)
 
         listFiles = driverListFiles + dropboxListFiles
 
         return Response({'data': listFiles})
 
 
-class UserSettingJobViewGet(APIView):
+class SearchFolderSettingView(APIView):
     # permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
-        folderSettings = UserSettingJob.objects.filter(key__in=('driver', 'dropbox')).values('key', 'value')
-        folderSettingsIndict = {d['key']: d['value'] for d in folderSettings}
-        return Response({'data': folderSettingsIndict})
+        searchFolder = UserSettingJob.objects.filter(key='search_folder').get()
+        return Response({'data': searchFolder.value})
 
 
-class UserSettingJobViewPut(APIView):
-    # permission_classes = [IsAuthenticated]
-    def put(self, request, key):
-        value = request.query_params.get('value', '')
-        UserSettingJob.objects.filter(key=key).update(value=value)
-        print(key)
+    def put(self, request):
+        value = request.data.get('value', '')
+        subkey = request.data.get('subkey', '')
+        searchFodlerObj = UserSettingJob.objects.filter(key='search_folder').get()
+        searchFodlerObj.value[subkey] = value
+        searchFodlerObj.save()
         return Response({'data': 'Ok'})

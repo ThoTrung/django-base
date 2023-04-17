@@ -24,16 +24,26 @@ import Router from 'next/router'
 import PAGE from 'config/page.config'
 import DateTimePicker from 'react-datetime'
 import { string } from 'prop-types'
-import { listFolderFromDisk, IListFolderFromDisk, IOneFolder } from 'store/request/job_manager'
+import {
+	listFolderFromDisk, IListFolderFromDisk, IOneFolder,
+	getSearchFolderSetting, ISettingSearchFolder, putSearchFolderSetting
+} from 'store/request/job_manager'
 
 // https://upmin-react.blueupcode.com/
 
-interface aa {
-	lastModifiedFolder: string;
-	files: string[],
+interface ISearchFolderSetting {
+	driver: string;
+	dropbox: string;
 }
-interface Prop {
-	[key: string]: aa[]
+
+
+// interface aa {
+// 	lastModifiedFolder: string;
+// 	files: string[],
+// }
+type IProps = {
+	searchFolderSetting: ISearchFolderSetting
+	// [key: string]: aa[]
 }
 
 const DashboardPage: ExtendedNextPage = (props) => {
@@ -45,6 +55,27 @@ const DashboardPage: ExtendedNextPage = (props) => {
 	const [endTime, setEndTime] = React.useState<string>('');
 	const [loading, setLoading] = React.useState<boolean>(false);
 	const [data, setData] = React.useState<IOneFolder[]>();
+
+	React.useEffect(() => {
+		getSearchFolderSetting()
+			.then((res) => res.data)
+			.then((data) => {
+				setDriverPath(data.data.driver);
+				setDropboxPath(data.data.dropbox);
+			})
+	}, [])
+
+	// const updateSearchFolderSetting = (subkey: string) => {
+	// 	if (subkey === 'driver') {
+	// 		const value = driverPath;
+	// 		setIsEditingDriverPath(!isEditingDriverPath);
+	// 		putSearchFolderSetting({subkey, value});
+	// 	} else if (subkey === 'dropbox'){
+	// 		const value = dropboxPath;
+	// 		setIsEditingDropboxPath(!isEditingDropboxPath);
+	// 		putSearchFolderSetting({subkey, value});
+	// 	}
+	// }
 
 	const filter = async () => {
 		setLoading(true);
@@ -63,9 +94,11 @@ const DashboardPage: ExtendedNextPage = (props) => {
 
 	const toggleEditingDriverPath = () => {
 		setIsEditingDriverPath(!isEditingDriverPath);
+		putSearchFolderSetting({subkey: 'driver', value: driverPath});
 	}
 	const toggleEditingDropboxPath = () => {
 		setIsEditingDropboxPath(!isEditingDropboxPath);
+		putSearchFolderSetting({subkey: 'dropbox', value: dropboxPath})
 	}
 
 	console.log('props',props)
@@ -80,13 +113,14 @@ const DashboardPage: ExtendedNextPage = (props) => {
 						E:\Dropbox\
 					</Form.Label>
 					<Form.Control
-						placeholder="Your Driver path"
+						placeholder="Your Dropbox path"
 						className='ms-1'
-						disabled={!isEditingDriverPath}
-						onChange={e => setDriverPath(e.target.value)}
+						disabled={!isEditingDropboxPath}
+						onChange={e => setDropboxPath(e.target.value)}
+						defaultValue={dropboxPath}
 					/>
-					<Button variant={'primary'} onClick={toggleEditingDriverPath} className="ms-3 text-nowrap miw-80">
-					{isEditingDriverPath ? 'Lưu' : 'Thay đổi'}
+					<Button variant={'primary'} onClick={toggleEditingDropboxPath} className="ms-3 text-nowrap miw-80">
+					{isEditingDropboxPath ? 'Lưu' : 'Thay đổi'}
 					</Button>{' '}
 				</Col>
 
@@ -98,13 +132,14 @@ const DashboardPage: ExtendedNextPage = (props) => {
 						E:\MyDrive\
 					</Form.Label>
 					<Form.Control
-						placeholder="Your Dropbox path"
+						placeholder="Your Driver path"
 						className='ms-1'
-						disabled={!isEditingDropboxPath}
-						onChange={e => setDropboxPath(e.target.value)}
+						disabled={!isEditingDriverPath}
+						onChange={e => setDriverPath(e.target.value)}
+						defaultValue={driverPath}
 					/>
-					<Button variant={'primary'} onClick={toggleEditingDropboxPath} className="ms-3 text-nowrap miw-80">
-						{isEditingDropboxPath ? 'Lưu' : 'Thay đổi'}
+					<Button variant={'primary'} onClick={toggleEditingDriverPath} className="ms-3 text-nowrap miw-80">
+						{isEditingDriverPath ? 'Lưu' : 'Thay đổi'}
 					</Button>{' '}
 				</Col>
 
@@ -173,8 +208,11 @@ const DashboardPage: ExtendedNextPage = (props) => {
 }
 
 export const getStaticProps: GetStaticProps = async (context) => {
+	// const searchFolderSetting = await getSearchFolderSetting()
   return {
-    props: {a:11}, // will be passed to the page component as props
+    props: {
+			// searchFolderSetting: searchFolderSetting.data
+		}, // will be passed to the page component as props
   }
 }
 

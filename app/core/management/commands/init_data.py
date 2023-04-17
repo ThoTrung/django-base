@@ -15,6 +15,6 @@ class Command(BaseCommand):
         ])
 
         UserSettingJob.objects.bulk_create([
-            UserSettingJob(key='driver', value=''),
-            UserSettingJob(key='dropbox', value=''),
+            UserSettingJob(key='search_folder', value={'driver': '', 'dropbox': ''}),
+            UserSettingJob(key='ignore_folder', value={'folders': []}),
         ])

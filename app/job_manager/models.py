@@ -12,7 +12,7 @@ class BaseModel(models.Model):
 
 class UserSettingJob(BaseModel):
     key=models.CharField(max_length=50, unique=True)
-    value=models.CharField(max_length=520)
+    value=models.JSONField()
 
     def __str__(self):
         return self.key
