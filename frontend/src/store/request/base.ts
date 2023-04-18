@@ -7,11 +7,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { getSLoginToken } from "store/auth/selectors";
 import { ILogin } from 'store/auth/types';
 
-console.log('11111111111', apiUrl);
-
 const requestInstance = Axios.create({
   baseURL: apiUrl,
-  timeout: 3000,
+  timeout: 300000,
   headers: {}
 });
 
