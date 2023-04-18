@@ -67,8 +67,8 @@ const LoginForm: React.FC = (props) => {
 	const { control, handleSubmit, watch } = useForm<LoginFormInputs>({
 		resolver: yupResolver(validationSchema),
 		defaultValues: {
-			email: 'tho.nt@gmail.com',
-			password: '123456',
+			email: '',
+			password: '',
 		},
 	})
 

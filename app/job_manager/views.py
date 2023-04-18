@@ -50,7 +50,11 @@ class ListFolderFromDiskView(APIView):
                         res[folderPath] = {
                             'files': [],
                             'lastModifiedFolder': '',
-                            'path': folderPath
+                            'path': pathlib.Path(folderPath).as_posix().replace(
+                                '/LocalDrive', 'E:\\MyDrive'
+                            ).replace(
+                                '/LocalDropbox', 'E:\\Dropbox'
+                            ).replace('/', '\\')
                         }
                     res[folderPath]['files'].append(str(file.resolve()))
 
@@ -69,6 +73,7 @@ class ListFolderFromDiskView(APIView):
 
         ignoreFolderSetting = UserSettingJob.objects.filter(key='ignore_folder').get()
         ignoreFolders = set(ignoreFolderSetting.value['folders'])
+
         searchFolderSetting = UserSettingJob.objects.filter(key='search_folder').get()
         driverFolderPath = DRIVER_FOLDER + searchFolderSetting.value['driver']
         dropboxFolderPath = DROPBOX_FOLDER + searchFolderSetting.value['dropbox']
@@ -88,13 +93,24 @@ class SearchFolderSettingView(APIView):
 
     def get(self, request, format=None):
         searchFolder = UserSettingJob.objects.filter(key='search_folder').get()
-        return Response({'data': searchFolder.value})
+        driverPosixPath = searchFolder.value['driver']
+        dropboxPosixPath = searchFolder.value['dropbox']
+
+        driverWindowPath = pathlib.Path(driverPosixPath).as_posix().replace('/', '\\')
+        dropboxWindowPath = pathlib.Path(dropboxPosixPath).as_posix().replace('/', '\\')
+
+        return Response({'data': {
+            'driver': driverWindowPath,
+            'dropbox': dropboxWindowPath
+        }})
 
 
     def put(self, request):
-        value = request.data.get('value', '')
+        windowPath = request.data.get('value', '')
         subkey = request.data.get('subkey', '')
+
+        posixPath = pathlib.Path(windowPath).as_posix().replace('\\', '/')
         searchFodlerObj = UserSettingJob.objects.filter(key='search_folder').get()
-        searchFodlerObj.value[subkey] = value
+        searchFodlerObj.value[subkey] = posixPath
         searchFodlerObj.save()
         return Response({'data': 'Ok'})

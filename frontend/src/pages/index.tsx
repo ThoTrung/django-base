@@ -82,8 +82,8 @@ const DashboardPage: ExtendedNextPage = (props) => {
 		const res = await listFolderFromDisk({
 			driverPath,
 			dropboxPath,
-			startTime: startTime ? startTime.format('YYYY-MM-DD h:mm') : '',
-			endTime: endTime ? endTime.format('YYYY-MM-DD h:mm') : '',
+			startTime: startTime ? startTime.format('YYYY-MM-DD HH:mm') : '',
+			endTime: endTime ? endTime.format('YYYY-MM-DD HH:mm') : '',
 		})
 		setLoading(false);
 		if (res.status === 200) {
