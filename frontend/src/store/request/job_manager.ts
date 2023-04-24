@@ -22,6 +22,10 @@ export const listFolderFromDisk = async (params: IListFolderFromDisk) => {
   const res = await requestInstance.get('api/job-managers/list-folder-from-disk', {params});
   return res;
 }
+export const listSpecifyFolderFromDisk = async (params: IListFolderFromDisk) => {
+  const res = await requestInstance.get('api/job-managers/list-specify-folder-from-disk', {params});
+  return res;
+}
 
 
 export const getSearchFolderSetting = () => {

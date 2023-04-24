@@ -3,34 +3,24 @@ import Moment from 'moment';
 import { GetStaticProps, GetStaticPaths, GetServerSideProps } from 'next'
 import withAuth from 'components/auth/withAuth'
 import { Row, Col, Portlet, Form, Button, InputGroup, Table, Spinner } from '@blueupcode/components'
-import Widget3 from 'components/widgets/Widget3'
-import Widget7 from 'components/widgets/Widget7'
-import Widget10 from 'components/widgets/Widget10'
-import Widget13 from 'components/widgets/Widget13'
-import Widget14 from 'components/widgets/Widget14'
-import Widget15 from 'components/widgets/Widget15'
-import Widget16 from 'components/widgets/Widget16'
-import Widget18 from 'components/widgets/Widget18'
-import Widget21 from 'components/widgets/Widget21'
-import Widget22 from 'components/widgets/Widget22'
-import Widget27 from 'components/widgets/Widget27'
-import Widget28 from 'components/widgets/Widget28'
-import Widget29 from 'components/widgets/Widget29'
-import Widget33 from 'components/widgets/Widget33'
-import Widget34 from 'components/widgets/Widget34'
-import Widget35 from 'components/widgets/Widget35'
+
 import type { ExtendedNextPage } from '@blueupcode/components/types'
 import Router from 'next/router'
 import PAGE from 'config/page.config'
 import DateTimePicker from 'react-datetime'
 import { string } from 'prop-types'
 import {
-	listFolderFromDisk, IListFolderFromDisk, IOneFolder,
+	listFolderFromDisk, IListFolderFromDisk, IOneFolder, listSpecifyFolderFromDisk,
 	getSearchFolderSetting, ISettingSearchFolder, putSearchFolderSetting
 } from 'store/request/job_manager'
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 // https://upmin-react.blueupcode.com/
+import {
+	faAngleDown,
+} from '@fortawesome/free-solid-svg-icons'
 
+import SortableHeader, { IHandleSortParam } from 'components/table/sortable-header';
+import moment from 'moment';
 interface ISearchFolderSetting {
 	driver: string;
 	dropbox: string;
@@ -51,10 +41,12 @@ const DashboardPage: ExtendedNextPage = (props) => {
 	const [isEditingDriverPath, setIsEditingDriverPath] = React.useState<boolean>(false);
 	const [dropboxPath, setDropboxPath] = React.useState<string>('');
 	const [isEditingDropboxPath, setIsEditingDropboxPath] = React.useState<boolean>(false);
-	const [startTime, setStartTime] = React.useState<string>('');
-	const [endTime, setEndTime] = React.useState<string>('');
+	const [startTime, setStartTime] = React.useState<Moment.Moment>(Moment().startOf('day'));
+	const [endTime, setEndTime] = React.useState<Moment.Moment>(Moment());
 	const [loading, setLoading] = React.useState<boolean>(false);
+	const [errorMsg, setErrorMsg] = React.useState<string>('');
 	const [data, setData] = React.useState<IOneFolder[]>();
+	const [sortkey, setSortKey] = React.useState<string>('');
 
 	React.useEffect(() => {
 		getSearchFolderSetting()
@@ -65,31 +57,45 @@ const DashboardPage: ExtendedNextPage = (props) => {
 			})
 	}, [])
 
-	// const updateSearchFolderSetting = (subkey: string) => {
-	// 	if (subkey === 'driver') {
-	// 		const value = driverPath;
-	// 		setIsEditingDriverPath(!isEditingDriverPath);
-	// 		putSearchFolderSetting({subkey, value});
-	// 	} else if (subkey === 'dropbox'){
-	// 		const value = dropboxPath;
-	// 		setIsEditingDropboxPath(!isEditingDropboxPath);
-	// 		putSearchFolderSetting({subkey, value});
-	// 	}
-	// }
+	const handleSortTableColumn = (param: IHandleSortParam) => {
+		setLoading(true);
+		setSortKey(param.orgKey);
+		console.log('param', param);
+		if (data) {
+			const sortedData = [...data].sort((a, b) => {
+				const res = param.sortType === 'DESC' ? 1 : -1;
+				return b[param.orgKey] > a[param.orgKey] ? res : -res;
+			});
+			setData(sortedData);
+		}
+		// Sort array
+		setLoading(false);
+	}
 
 	const filter = async () => {
 		setLoading(true);
-		const res = await listFolderFromDisk({
-			driverPath,
-			dropboxPath,
-			startTime: startTime ? startTime.format('YYYY-MM-DD HH:mm') : '',
-			endTime: endTime ? endTime.format('YYYY-MM-DD HH:mm') : '',
-		})
-		setLoading(false);
-		if (res.status === 200) {
-			console.log(res.data, res.status);
-			setData(res.data.data);
+		setSortKey('');
+		try {
+			// const res = await listFolderFromDisk({
+			const res = await listSpecifyFolderFromDisk({
+				driverPath,
+				dropboxPath,
+				startTime: startTime ? startTime.format('YYYY-MM-DD HH:mm') : '',
+				endTime: endTime ? endTime.format('YYYY-MM-DD HH:mm') : '',
+			})
+			if (res.status === 200) {
+				console.log(res.data, res.status);
+				setData(res.data.data);
+				if (res.data.data?.length === 0) {
+					setErrorMsg('Không có data.');
+				}
+			}
+		} catch (e) {
+			console.log(e);
+			setData([]);
+			setErrorMsg('Có lỗi xảy ra khi thực hiện Tìm kiếm. Bạn hãy chỉ định khoảng Tìm kiếm cụ thể hơn hoặc liên lạc với Admin để được hỗ trợ');
 		}
+		setLoading(false);
 	}
 
 	const toggleEditingDriverPath = () => {
@@ -119,7 +125,7 @@ const DashboardPage: ExtendedNextPage = (props) => {
 						onChange={e => setDropboxPath(e.target.value)}
 						defaultValue={dropboxPath}
 					/>
-					<Button variant={'primary'} onClick={toggleEditingDropboxPath} className="ms-3 text-nowrap miw-80">
+					<Button variant={'primary'} disabled={loading} onClick={toggleEditingDropboxPath} className="ms-3 text-nowrap miw-80">
 					{isEditingDropboxPath ? 'Lưu' : 'Thay đổi'}
 					</Button>{' '}
 				</Col>
@@ -138,7 +144,7 @@ const DashboardPage: ExtendedNextPage = (props) => {
 						onChange={e => setDriverPath(e.target.value)}
 						defaultValue={driverPath}
 					/>
-					<Button variant={'primary'} onClick={toggleEditingDriverPath} className="ms-3 text-nowrap miw-80">
+					<Button variant={'primary'} disabled={loading} onClick={toggleEditingDriverPath} className="ms-3 text-nowrap miw-80">
 						{isEditingDriverPath ? 'Lưu' : 'Thay đổi'}
 					</Button>{' '}
 				</Col>
@@ -152,6 +158,7 @@ const DashboardPage: ExtendedNextPage = (props) => {
 						dateFormat="YYYY-MM-DD"
 						timeFormat="hh:mm a"
 						onChange={e => setStartTime(e)}
+						value={startTime}
 					/>
 					<Form.Label column className='ms-5 me-3 maw-140'>
 						Thời gian kết thúc
@@ -161,6 +168,7 @@ const DashboardPage: ExtendedNextPage = (props) => {
 						dateFormat="YYYY-MM-DD"
 						timeFormat="hh:mm a"
 						onChange={e => setEndTime(e)}
+						value={endTime}
 					/>
 					<Button
 						variant={'success'}
@@ -182,23 +190,37 @@ const DashboardPage: ExtendedNextPage = (props) => {
 						<thead className='table-primary'>
 							<tr>
 								<th scope="col" className='w-30'>#</th>
-								<th scope="col" className=''>Thư mục</th>
-								<th scope="col" className='w-130'>Thời gian cập nhật</th>
+								<th scope="col" className=''>
+									<SortableHeader
+										title='Thư mục'
+										orgKey='path'
+										sortKey={sortkey}
+										handleSortTableColumn={handleSortTableColumn}
+									/>
+								</th>
+								<th scope="col" className='w-130'>
+									<SortableHeader
+										title='Thời gian cập nhật'
+										orgKey='lastModifiedFolder'
+										sortKey={sortkey}
+										handleSortTableColumn={handleSortTableColumn}
+									/>
+								</th>
 								<th scope="col" className='w-30'>Số file</th>
 							</tr>
 						</thead>
-						<tbody>
+							<tbody>
 							{data && data?.length > 0 ? (
-								data.map((item, idx) => (
-									<tr key={idx + 1}>
-										<th scope="row">{idx + 1}</th>
-										<td>{item.path}</td>
-										<td>{item.lastModifiedFolder}</td>
-										<td>{item.files ? item.files.length : 0}</td>
-									</tr>
-								))
+									data.map((item, idx) => (
+										<tr key={idx + 1}>
+											<th scope="row">{idx + 1}</th>
+											<td>{item.path}</td>
+											<td>{item.lastModifiedFolder}</td>
+											<td>{item.files ? item.files.length : 0}</td>
+										</tr>
+									))
 							) : (
-								<div className='w-130'>Không có data.</div>
+								<tr><div className=''>{errorMsg}</div></tr>
 							)}
 						</tbody>
 					</Table>

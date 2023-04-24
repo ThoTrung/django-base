@@ -28,3 +28,36 @@ docker rmi $(docker images -a|grep "<none>"|awk '$1=="<none>" {print $3}')
 
 # Theme 
 https://upmin-react.blueupcode.com/
+
+
+
+
+import pathlib
+import re
+pattern = re.compile(r"^02 - *$")
+directory_path = pathlib.Path('/LocalDrive/')
+for subfolder_path in directory_path.glob(f"*"):
+    print(subfolder_path.resolve())
+    # if subfolder_path.is_dir():
+
+
+from pathlib import Path
+import os
+
+for path in Path('/LocalDrive/sub*/Input').rglob('*'):
+for path in Path('/LocalDrive/sub*').rglob('*'):
+
+for path in Path('/LocalDrive/').glob('sub*/Input'):
+for path in Path('/LocalDrive/').glob('sub*/Input/*/'):
+    print(path.resolve())
+    print(datetime.fromtimestamp(path.lstat().st_mtime).strftime('%Y-%m-%d %H:%M'))
+    if path.is_dir():
+
+
+
+import os
+from pathlib import Path
+
+for path in Path('/LocalDrive/').glob('sub*/Input/*'):
+    if path.is_dir():
+        print(os.listdir(path))
