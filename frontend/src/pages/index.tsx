@@ -18,6 +18,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
 	faAngleDown,
 } from '@fortawesome/free-solid-svg-icons'
+import { DATETIME_FORMAT, DATE_FORMAT, TIME_FORMAT } from 'constant/const';
 
 import SortableHeader, { IHandleSortParam } from 'components/table/sortable-header';
 interface ISearchFolderSetting {
@@ -56,6 +57,10 @@ const DashboardPage: ExtendedNextPage = (props) => {
 			})
 	}, [])
 
+	const createJob = () => {
+		return Router.push('/create_job')
+	}
+
 	const handleSortTableColumn = (param: IHandleSortParam) => {
 		setLoading(true);
 		setSortKey(param.orgKey);
@@ -79,8 +84,8 @@ const DashboardPage: ExtendedNextPage = (props) => {
 			const res = await listSpecifyFolderFromDisk({
 				driverPath,
 				dropboxPath,
-				startTime: startTime ? startTime.format('YYYY-MM-DD HH:mm') : '',
-				endTime: endTime ? endTime.format('YYYY-MM-DD HH:mm') : '',
+				startTime: startTime ? startTime.format(DATETIME_FORMAT) : '',
+				endTime: endTime ? endTime.format(DATETIME_FORMAT) : '',
 			})
 			if (res.status === 200) {
 				console.log(res.data, res.status);
@@ -154,8 +159,8 @@ const DashboardPage: ExtendedNextPage = (props) => {
 					</Form.Label>
 					<DateTimePicker
 						closeOnSelect
-						dateFormat="YYYY-MM-DD"
-						timeFormat="hh:mm a"
+						dateFormat={DATE_FORMAT}
+						timeFormat={TIME_FORMAT}
 						onChange={e => setStartTime(e)}
 						value={startTime}
 					/>
@@ -164,8 +169,8 @@ const DashboardPage: ExtendedNextPage = (props) => {
 					</Form.Label>
 					<DateTimePicker
 						closeOnSelect
-						dateFormat="YYYY-MM-DD"
-						timeFormat="hh:mm a"
+						dateFormat={DATE_FORMAT}
+						timeFormat={TIME_FORMAT}
 						onChange={e => setEndTime(e)}
 						value={endTime}
 					/>
@@ -206,6 +211,8 @@ const DashboardPage: ExtendedNextPage = (props) => {
 									/>
 								</th>
 								<th scope="col" className='w-30'>Số file</th>
+								<th scope="col" className='w-30'>Trạng thái</th>
+								<th scope="col" className='w-30'>Thao tác</th>
 							</tr>
 						</thead>
 							<tbody>
@@ -216,6 +223,12 @@ const DashboardPage: ExtendedNextPage = (props) => {
 											<td>{item.path}</td>
 											<td>{Moment.unix(parseFloat(item.lastModifiedFolder)).format('YYYY-MM-DD HH:mm')}</td>
 											<td>{item.files ? item.files.length : 0}</td>
+											<td className='miw-120'>Chưa tạo job</td>
+											<td>
+												<Button variant={'success'} onClick={createJob} className="ms-3 text-nowrap miw-80">
+													Tạo Job
+												</Button>{' '}
+											</td>
 										</tr>
 									))
 							) : (
