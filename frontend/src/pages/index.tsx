@@ -20,7 +20,6 @@ import {
 } from '@fortawesome/free-solid-svg-icons'
 
 import SortableHeader, { IHandleSortParam } from 'components/table/sortable-header';
-import moment from 'moment';
 interface ISearchFolderSetting {
 	driver: string;
 	dropbox: string;
@@ -215,7 +214,7 @@ const DashboardPage: ExtendedNextPage = (props) => {
 										<tr key={idx + 1}>
 											<th scope="row">{idx + 1}</th>
 											<td>{item.path}</td>
-											<td>{item.lastModifiedFolder}</td>
+											<td>{Moment.unix(parseFloat(item.lastModifiedFolder)).format('YYYY-MM-DD HH:mm')}</td>
 											<td>{item.files ? item.files.length : 0}</td>
 										</tr>
 									))
