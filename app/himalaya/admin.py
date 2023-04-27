@@ -4,7 +4,9 @@ from . import models
 # Register your models here.
 class DmDoituongAdmin(admin.ModelAdmin):
     pass
-admin.site.register(models.DmDoituong,DmDoituongAdmin, using='himalaya')
+admin.site.register(models.DmDoituong,DmDoituongAdmin)
 
-# othersite = admin.AdminSite("himalaya")
-# othersite.register(models.DmDoituong)
+
+class DmNhomdoituongAdmin(admin.ModelAdmin):
+    pass
+admin.site.register(models.DmNhomdoituong,DmNhomdoituongAdmin)
