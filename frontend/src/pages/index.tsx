@@ -78,7 +78,7 @@ const DashboardPage: ExtendedNextPage = (props) => {
 
 	const filter = async () => {
 		setLoading(true);
-		setSortKey('');
+		setSortKey('handleSortTableColumn');
 		try {
 			// const res = await listFolderFromDisk({
 			const res = await listSpecifyFolderFromDisk({
@@ -88,8 +88,11 @@ const DashboardPage: ExtendedNextPage = (props) => {
 				endTime: endTime ? endTime.format(DATETIME_FORMAT) : '',
 			})
 			if (res.status === 200) {
-				console.log(res.data, res.status);
-				setData(res.data.data);
+				const sortedData = [...res.data.data].sort((a, b) => {
+					const res = 1;
+					return b['handleSortTableColumn'] > a['handleSortTableColumn'] ? res : -res;
+				});
+				setData(sortedData);
 				if (res.data.data?.length === 0) {
 					setErrorMsg('Không có data.');
 				}

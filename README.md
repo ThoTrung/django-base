@@ -23,7 +23,7 @@ https://docs.github.com/en/actions/deployment/targeting-different-environments/u
 https://django-auditlog.readthedocs.io/en/latest/usage.html
 
 
-#Clear docker none
+# Clear docker none
 docker rmi $(docker images -a|grep "<none>"|awk '$1=="<none>" {print $3}')
 
 # Theme 
