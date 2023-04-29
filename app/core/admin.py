@@ -4,6 +4,7 @@ Django admin customization.
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import gettext_lazy as _
+from django.contrib.auth.models import Permission, ContentType
 
 from core import models
 
@@ -45,6 +46,22 @@ class UserAdmin(BaseUserAdmin):
 
 
 admin.site.register(models.User, UserAdmin)
+
+class PermissionAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name', 'content_type', 'codename']
+    list_filter = ['content_type']
+    search_fields = ['name', 'codename']
+    ordering = ['content_type', 'codename']
+
+admin.site.register(Permission, PermissionAdmin)
+
+class ContentTypeAdmin(admin.ModelAdmin):
+    list_display = ['id', 'app_label', 'model']
+    list_filter = ['app_label']
+    search_fields = ['app_label', 'model']
+    ordering = ['app_label', 'model']
+
+admin.site.register(ContentType, ContentTypeAdmin)
 # admin.site.register(models.Recipe)
 # admin.site.register(models.Tag)
 # admin.site.register(models.Ingredient)

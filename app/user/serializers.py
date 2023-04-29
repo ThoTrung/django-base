@@ -8,6 +8,7 @@ from django.contrib.auth import (
 from django.utils.translation import gettext as _
 
 from rest_framework import serializers
+from django.contrib.auth.models import Group, Permission
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -57,3 +58,26 @@ class AuthTokenSerializer(serializers.Serializer):
 
         attrs['user'] = user
         return attrs
+
+
+class GroupModifySerializer(serializers.ModelSerializer):
+    permissions = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=Permission.objects.filter(
+            content_type__app_label='custom_job_manager'
+        ).all()
+    )
+    class Meta:
+        model = Group
+        fields = ['name', 'permissions']
+
+class PermissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Permission
+        fields = '__all__'
+
+class GroupSerializer(serializers.ModelSerializer):
+    permissions = PermissionSerializer(many=True)
+    class Meta:
+        model = Group
+        fields = ['id', 'name', 'permissions']

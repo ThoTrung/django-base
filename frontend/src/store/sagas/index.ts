@@ -5,11 +5,11 @@ import myInfoSaga from 'store/myInfo/sagas';
 
 
 // function* rootSaga() {
-// 	yield takeEvery('MENU_ACTIVE_LINK_CHANGE', separatingActiveLink)
-// 	yield all([helloSaga(), watchIncrementAsync()])
-// }
-
+  // 	yield all([helloSaga(), watchIncrementAsync()])
+  // }
+  
 function* rootSaga() {
+  yield takeEvery('MENU_ACTIVE_LINK_CHANGE', separatingActiveLink)
   yield all([loginSaga(), myInfoSaga()]);
 }
 

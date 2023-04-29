@@ -6,10 +6,20 @@ from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.settings import api_settings
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from django.contrib.auth.models import Group, Permission
 
 from user.serializers import (
     UserSerializer,
     AuthTokenSerializer,
+    GroupSerializer,
+    PermissionSerializer,
+    GroupModifySerializer,
+)
+
+from rest_framework import (
+    viewsets,
+    mixins,
+    status,
 )
 
 # We can custome here to get more infor of User,
@@ -48,3 +58,21 @@ class ManageUserView(generics.RetrieveUpdateAPIView):
     def get_object(self):
         """Retrieve and return the authenticated user."""
         return self.request.user
+
+
+class GroupViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = Group.objects.all()
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return GroupSerializer
+        else:
+            return GroupModifySerializer
+
+class PermissionViewSet(viewsets.ReadOnlyModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = Permission.objects.filter(
+        content_type__app_label='custom_job_manager'
+    ).all()
+    serializer_class = PermissionSerializer
+    

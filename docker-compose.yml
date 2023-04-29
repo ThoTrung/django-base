@@ -43,6 +43,7 @@ services:
       - DB_PASS=${DB_PASS}
       - DEBUG=1
       - ALLOWED_HOST=${ALLOWED_HOST}
+      - CSRF_TRUSTED_ORIGINS=${CSRF_TRUSTED_ORIGINS}
     depends_on:
       - db
   
