@@ -1,12 +1,17 @@
 """
 Views for the user API.
 """
+from django.contrib.auth import (
+    get_user_model,
+    authenticate,
+)
 from rest_framework import generics, authentication, permissions
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.settings import api_settings
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth.models import Group, Permission
+from core.models import Bank, User
 
 from user.serializers import (
     UserSerializer,
@@ -14,6 +19,7 @@ from user.serializers import (
     GroupSerializer,
     PermissionSerializer,
     GroupModifySerializer,
+    BankSerializer,
 )
 
 from rest_framework import (
@@ -77,3 +83,12 @@ class PermissionViewSet(viewsets.ReadOnlyModelViewSet):
     ).all()
     serializer_class = PermissionSerializer
     
+
+class BankViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Bank.objects.all()
+    serializer_class = BankSerializer
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = get_user_model().objects.all()
+    serializer_class = UserSerializer

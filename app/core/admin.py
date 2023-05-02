@@ -12,10 +12,24 @@ from core import models
 class UserAdmin(BaseUserAdmin):
     """Define the admin pages for users."""
     ordering = ['id']
-    list_display = ['email', 'name']
+    list_display = ['name', 'email']
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
-        (_('Personal Info'), {'fields': ('name',)}),
+        (
+            _('Personal Info'),
+            {
+                'fields': (
+                    'name',
+                    'full_name',
+                    'gender',
+                    'phone_number',
+                    'address',
+                    'bank',
+                    'bank_number',
+                    'status'
+                )
+            }
+        ),
         (
             _('Permissions'),
             {
@@ -23,6 +37,8 @@ class UserAdmin(BaseUserAdmin):
                     'is_active',
                     'is_staff',
                     'is_superuser',
+                    'groups',
+                    'user_permissions',
                 )
             }
         ),
@@ -62,6 +78,5 @@ class ContentTypeAdmin(admin.ModelAdmin):
     ordering = ['app_label', 'model']
 
 admin.site.register(ContentType, ContentTypeAdmin)
-# admin.site.register(models.Recipe)
-# admin.site.register(models.Tag)
-# admin.site.register(models.Ingredient)
+
+admin.site.register(models.Bank)

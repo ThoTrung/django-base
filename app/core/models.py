@@ -26,36 +26,24 @@ def recipe_image_file_path(instance, filename):
 class UserManager(BaseUserManager):
     """Manager for users."""
 
-    def create_user(self, email, password=None, **extra_fields):
+    def create_user(self, name, password=None, **extra_fields):
         """Create, save and return a new user."""
-        if not email:
-            raise ValueError('User must have an email address.')
-        user = self.model(email=self.normalize_email(email), **extra_fields)
+        if not name:
+            raise ValueError('User must have an name address.')
+        user = self.model(name=name, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
 
         return user
 
-    def create_superuser(self, email, password):
+    def create_superuser(self, name, password):
         """Create and return a new superuser."""
-        user = self.create_user(email, password)
+        user = self.create_user(name, password)
         user.is_staff = True
         user.is_superuser = True
         user.save(using=self._db)
 
         return user
-
-
-class User(AbstractBaseUser, PermissionsMixin):
-    """User in the system."""
-    email = models.EmailField(max_length=255, unique=True)
-    name = models.CharField(max_length=255, unique=True)
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
-
-    objects = UserManager()
-
-    USERNAME_FIELD = 'name'
 
 
 class BaseModel(models.Model):
@@ -64,6 +52,40 @@ class BaseModel(models.Model):
     
     class Meta:
         abstract = True
+
+class Bank(BaseModel):
+    name = models.CharField(max_length=255, unique=True)
+
+    def __str__(self):
+        return self.name
+
+class User(AbstractBaseUser, PermissionsMixin):
+    GENDER_CHOICES = (
+        ('M', 'Nam'),
+        ('F', 'Nữ'),
+        ('N', 'Không'),
+    )
+    STATUS_CHOICES = (
+        ('W', 'Làm việc'),
+        ('S', 'Đã nghỉ'),
+    )
+    """User in the system."""
+    email = models.EmailField(max_length=255, unique=True)
+    name = models.CharField(max_length=255, unique=True)
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+
+    full_name = models.CharField(max_length=255, blank=False, default='')
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, default='M')
+    phone_number = models.CharField(max_length=30, default='', blank=True)
+    address = models.CharField(max_length=255, default='', blank=True)
+    bank = models.ForeignKey(Bank, on_delete=models.CASCADE, null=True, blank=True)
+    bank_number=models.CharField(max_length=50, default='', blank=True)
+    status = models.CharField(max_length=1, choices=STATUS_CHOICES, default='W')
+
+    objects = UserManager()
+
+    USERNAME_FIELD = 'name'
 
 class Recipe(BaseModel):
     """Recipe object."""
