@@ -18,7 +18,7 @@ import { AShowLoading, AHideLoading } from 'store/common/actions'
 import { getSLoading } from "store/common/selectors";
 
 
-const LoginPage: ExtendedNextPage = () => {
+const LoginEmailPage: ExtendedNextPage = () => {
 	return (
 		<Row className="g-0 align-items-center justify-content-center h-100">
 			<Col sm={8} md={6} lg={4} xl={3}>
@@ -43,7 +43,7 @@ const LoginPage: ExtendedNextPage = () => {
 
 // Form validation schema
 const validationSchema = yup.object().shape({
-	name: yup.string().required('Please enter your name'),
+	email: yup.string().email('Your email is not valid').required('Please enter your email'),
 	password: yup.string().min(6, 'Please enter at least 6 characters').required('Please provide your password'),
 })
 
@@ -53,7 +53,7 @@ const LoginForm: React.FC = (props) => {
 	const { control, handleSubmit, watch } = useForm<LoginFormInputs>({
 		resolver: yupResolver(validationSchema),
 		defaultValues: {
-			name: '',
+			email: '',
 			password: '',
 		},
 	})
@@ -66,8 +66,8 @@ const LoginForm: React.FC = (props) => {
 
 		try {
 			console.log('On submit');
-			const payload={name: formData.name, password:formData.password};
-			// Try to login with name and password
+			const payload={email: formData.email, password:formData.password};
+			// Try to login with email and password
 			// const res = await dispatch(ALoginRequest(payload));
 			const res = await postLogin(payload);
 			if (res) {
@@ -92,19 +92,19 @@ const LoginForm: React.FC = (props) => {
 		<Form onSubmit={handleSubmit(onSubmit)} className="d-grid gap-3">
 			{/* BEGIN Validation Controller */}
 			<Controller
-				name="name"
+				name="email"
 				control={control}
 				render={({ field, fieldState: { invalid, error } }) => (
-					<Form.Group controlId="name">
+					<Form.Group controlId="email">
 						<Form.Floating>
 							<Form.Control
-								type='text'
+								type="email"
 								size="lg"
-								placeholder="Please insert your name"
+								placeholder="Please insert your email"
 								isInvalid={invalid}
 								{...field}
 							/>
-							<Form.Label>UserName</Form.Label>
+							<Form.Label>Email</Form.Label>
 							{invalid && <Form.Control.Feedback type="invalid">{error?.message}</Form.Control.Feedback>}
 						</Form.Floating>
 					</Form.Group>
@@ -148,12 +148,12 @@ const LoginForm: React.FC = (props) => {
 }
 
 interface LoginFormInputs {
-	name: string
+	email: string
 	password: string
 }
 
-LoginPage.pageTitle = 'Login'
-LoginPage.layoutName = 'blank'
+LoginEmailPage.pageTitle = 'Login'
+LoginEmailPage.layoutName = 'blank'
 
-export default withGuest(LoginPage)
-// export default LoginPage
+export default withGuest(LoginEmailPage)
+// export default LoginEmailPage
