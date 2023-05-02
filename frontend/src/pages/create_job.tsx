@@ -6,7 +6,7 @@ const CreateJobPage: ExtendedNextPage = (props) => {
 	
 	return (
 		<>
-			Trang tạo job
+			Developing ...
 		</>
 	)
 }
