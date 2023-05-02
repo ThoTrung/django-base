@@ -6,20 +6,25 @@ import { apiUrl } from "constant/env";
 import { useDispatch, useSelector } from "react-redux";
 import { getSLoginToken } from "store/auth/selectors";
 import { ILogin } from 'store/auth/types';
+import { isUnauthenticate, isInvalid } from './helper';
+import { swal } from 'components/sweetalert2/instance'
+import { AShowLoading, AHideLoading } from 'store/common/actions'
+import { put, call } from 'redux-saga/effects';
 
 const requestInstance = Axios.create({
-  baseURL: apiUrl,
+  baseURL: process.browser ? apiUrl : 'http://app:8000/',
   timeout: 300000,
   headers: {}
 });
 
-let isLoading = false;
+// let isLoading = false;
 
-requestInstance.interceptors.request.use(config => {
-  isLoading = true;
+requestInstance.interceptors.request.use(function (config) {
+  // isLoading = true;
   // const token = useSelector(getSLoginToken);
 
   // TODO: use token from store instead of localstorage
+  // yield call(requestShowLoading);
   const cookies = parseCookies();
   let token: ILogin | null = null;
   if (cookies && cookies.token) {
@@ -32,11 +37,19 @@ requestInstance.interceptors.request.use(config => {
 });
 
 requestInstance.interceptors.response.use(response => {
-  isLoading = false;
+  // isLoading = false;
   return response;
 }, error => {
-  isLoading = false;
-  throw error;
+  // isLoading = false;
+  if (isInvalid(error.response)) {
+    return error.response;
+  } else if (isUnauthenticate(error.response)) {
+    swal.fire({ text: 'Thông tin đăng nhập không đúng. Xin vui lòng đăng nhập lại', icon: 'error' })
+  } else {
+    swal.fire({ text: 'Có lỗi xảy ra. Vui long liên hệ Admin.', icon: 'error' })
+  }
+  return null;
+  // throw error;
 });
 
 export default requestInstance;

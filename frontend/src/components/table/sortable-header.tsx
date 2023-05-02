@@ -16,6 +16,17 @@ export interface ISortableHeaderProps {
 	handleSortTableColumn: (param: IHandleSortParam) => void
 }
 
+export const handleSortData:any = (param: IHandleSortParam, data:any) => {
+	if (data) {
+		const sortedData = [...data].sort((a, b) => {
+			const res = param.sortType === 'DESC' ? 1 : -1;
+			return b[param.orgKey] > a[param.orgKey] ? res : -res;
+		});
+		return sortedData;
+	}
+	return data;
+}
+
 const SortableHeader:React.FC<ISortableHeaderProps> = (props) => {
 	const [sortType, setSortType] = React.useState<string>('DESC');
 

@@ -1,7 +1,7 @@
 import {
-  LOGIN_REQUEST,
   LOGIN_SUCCESS,
   LOGIN_FAILURE,
+  LOGOUT_SUCCESS,
 } from "./actionTypes";
 
 export interface ILogin {
@@ -15,22 +15,12 @@ export interface ILoginState {
   error: string | null;
 }
 
-export interface ILoginRequestPayload {
-  email: string;
-  password: string;
-}
-
 export interface ILoginSuccessPayload {
   token: ILogin;
 }
 
 export interface ILoginFailurePayload {
   error: string;
-}
-
-export interface ILoginRequest {
-  type: typeof LOGIN_REQUEST;
-  payload: ILoginRequestPayload;
 }
 
 export type ILoginSuccess = {
@@ -43,7 +33,10 @@ export type ILoginFailure = {
   payload: ILoginFailurePayload;
 }
 
+export type ILogoutSuccess = {
+  type: typeof LOGOUT_SUCCESS;
+}
 export type TLoginAction =
-  | ILoginRequest
   | ILoginSuccess
+  | ILogoutSuccess
   | ILoginFailure;

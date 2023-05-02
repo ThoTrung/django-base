@@ -59,7 +59,7 @@ const DefaultLayout: React.FC<DefaultLayoutProps> = ({
 			</Structure>
 			<OffcanvasAgenda />
 			<OffcanvasSetting />
-			<LayoutFloatingButton />
+			{/* <LayoutFloatingButton /> */}
 		</>
 	)
 }

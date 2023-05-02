@@ -27,7 +27,6 @@ function* requestMyInfo() {
 }
 
 function* myInfoSaga() {
-  console.log('myInfoSaga -----');
   yield all([takeLatest(GET_MYINFO_REQUEST, requestMyInfo)]);
 }
 

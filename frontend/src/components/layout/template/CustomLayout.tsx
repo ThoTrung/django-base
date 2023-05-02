@@ -12,6 +12,7 @@ import OffcanvasSetting from '../offcanvas/setting/OffcanvasSetting'
 import LayoutFloatingButton from '../floating-button/FloatingButton'
 import PAGE from 'config/page.config'
 import type { PageBreadcrumb } from '@blueupcode/components/types'
+import SimpleLoading from 'components/loading/simpleLoading'
 
 const CustomLayout: React.FC<CustomLayoutProps> = ({
 	children,
@@ -45,6 +46,7 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({
 
 	return (
 		<>
+		  <SimpleLoading />
 			<Structure type="holder">
 				<LayoutAside />
 				<Structure type="wrapper">

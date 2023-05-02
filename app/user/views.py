@@ -61,16 +61,17 @@ class ManageUserView(generics.RetrieveUpdateAPIView):
 
 
 class GroupViewSet(viewsets.ModelViewSet):
-    permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = [permissions.IsAuthenticated]
     queryset = Group.objects.all()
-    def get_serializer_class(self):
-        if self.request.method == 'GET':
-            return GroupSerializer
-        else:
-            return GroupModifySerializer
+    serializer_class=GroupModifySerializer
+    # def get_serializer_class(self):
+    #     if self.request.method == 'GET':
+    #         return GroupSerializer
+    #     else:
+    #         return GroupModifySerializer
 
 class PermissionViewSet(viewsets.ReadOnlyModelViewSet):
-    permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = [permissions.IsAuthenticated]
     queryset = Permission.objects.filter(
         content_type__app_label='custom_job_manager'
     ).all()

@@ -10,13 +10,8 @@ import {
 } from '../../store/auth/selectors';
 
 const withGuest = (PageComponent: ExtendedNextPage) => {
-	console.log('222222222')
-	// Initialize wrapper component
-	// const token = useSelector(getSLoginToken);
-
 	const WrapperComponent: ExtendedNextPage = (props) => {
 		const token = useSelector(getSLoginToken);
-		console.log('tokentoken', token);
 		React.useEffect(() => {
 			if (token) {
 				return Router.push((Router.query.redirect as string) || PAGE.homePagePath)

@@ -16,16 +16,19 @@ import { signOut } from 'firebase/auth'
 import Router from 'next/router'
 import PAGE from 'config/page.config'
 import type { ButtonVariant } from '@blueupcode/components/types'
+import { ALogoutSuccess } from 'store/auth/actions'
+import { useDispatch } from "react-redux";
 
 const LayoutHeaderUser: React.FC<LayoutHeaderUserProps> = ({ variant }) => {
 	const { userData } = useAuth()
+	const dispatch = useDispatch();
 
 	const email = userData?.email
 	const fullName = userData?.displayName
 
 	const handleLogout = async () => {
 		// Sign out with Firebase
-		await signOut(firebaseAuth)
+		dispatch(ALogoutSuccess());
 
 		// Redirect to login page
 		Router.push(PAGE.loginPagePath)
@@ -115,7 +118,7 @@ const LayoutHeaderUser: React.FC<LayoutHeaderUserProps> = ({ variant }) => {
 						{/* END Grid Nav */}
 					</Portlet.Body>
 					<Portlet.Footer bordered className="rounded-0" onClick={handleLogout}>
-						<Button variant="label-danger">Sign out</Button>
+						<Button variant="label-danger">Đăng xuất</Button>
 					</Portlet.Footer>
 				</Portlet>
 				{/* END Portlet */}

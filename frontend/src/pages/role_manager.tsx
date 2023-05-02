@@ -1,131 +1,85 @@
 import React from 'react'
-import Moment from 'moment';
-import { GetStaticProps, GetStaticPaths, GetServerSideProps } from 'next'
+
 import withAuth from 'components/auth/withAuth'
 import { Row, Col, Portlet, Form, Button, InputGroup, Table, Spinner } from '@blueupcode/components'
+import { useDispatch } from "react-redux";
+import { AShowLoading, AHideLoading } from 'store/common/actions'
 
 import type { ExtendedNextPage } from '@blueupcode/components/types'
-import Router from 'next/router'
-import PAGE from 'config/page.config'
-import DateTimePicker from 'react-datetime'
-import { string } from 'prop-types'
-import {
-	listFolderFromDisk, IListFolderFromDisk, IOneFolder, listSpecifyFolderFromDisk,
-	getSearchFolderSetting, ISettingSearchFolder, putSearchFolderSetting
-} from 'store/request/job_manager'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-// https://upmin-react.blueupcode.com/
-import {
-	faAngleDown,
-} from '@fortawesome/free-solid-svg-icons'
-import { DATETIME_FORMAT, DATE_FORMAT, TIME_FORMAT } from 'constant/const';
-
-import SortableHeader, { IHandleSortParam } from 'components/table/sortable-header';
-interface ISearchFolderSetting {
-	driver: string;
-	dropbox: string;
-}
+import { IUserGroups, listUserGroups, IUserPermissions, listUserPermissions } from 'store/request/user_manager';
+import RoleManagerModal from 'modals/role_manager';
+import { modalType, detailType, newType, updateType } from 'constant/type';
+import { isSuccessRequest } from 'store/request/helper'
+import SortableHeader, { IHandleSortParam, handleSortData } from 'components/table/sortable-header';
 
 
-// interface aa {
-// 	lastModifiedFolder: string;
-// 	files: string[],
-// }
-type IProps = {
-	searchFolderSetting: ISearchFolderSetting
-	// [key: string]: aa[]
-}
+export type IRoleManageProps = {
+	data: {
+		userGroups: IUserGroups[]
+		userPermissions: {
+			[key: number]: IUserPermissions
+		}
+	}
+};
 
-const RoleManager: ExtendedNextPage = (props) => {
-	const [driverPath, setDriverPath] = React.useState<string>('');
-	const [isEditingDriverPath, setIsEditingDriverPath] = React.useState<boolean>(false);
-	const [dropboxPath, setDropboxPath] = React.useState<string>('');
-	const [isEditingDropboxPath, setIsEditingDropboxPath] = React.useState<boolean>(false);
-	const [startTime, setStartTime] = React.useState<Moment.Moment>(Moment().startOf('day'));
-	const [endTime, setEndTime] = React.useState<Moment.Moment>(Moment());
+const RoleManager: ExtendedNextPage<IRoleManageProps> = (props) => {
 	const [loading, setLoading] = React.useState<boolean>(false);
 	const [errorMsg, setErrorMsg] = React.useState<string>('');
-	const [data, setData] = React.useState<IOneFolder[]>();
-	const [sortkey, setSortKey] = React.useState<string>('');
+	const [typeModal, setTypeModal] = React.useState<modalType>(updateType);
+	const [showModal, setShowModal] = React.useState<boolean>(false);
+	const [userGroups, setUserGroups] = React.useState<IUserGroups[]>(props.data.userGroups);
+	const [selectedGroup, setSelectedGroup] = React.useState<IUserGroups | null>(null)
+	const [sortKey, setSortKey] = React.useState<string>('');
+	const [sortType, setSortType] = React.useState<string>('');
 
-	React.useEffect(() => {
-		getSearchFolderSetting()
-			.then((res) => res.data)
-			.then((data) => {
-				setDriverPath(data.data.driver);
-				setDropboxPath(data.data.dropbox);
-			})
-	}, [])
+	const dispatch = useDispatch();
 
-	const createJob = () => {
-		return Router.push('/create_job')
+	const refreshData = async() => {
+		const resUserGroups = await listUserGroups();
+		console.log('resUserGroups', resUserGroups.data, sortKey, sortType)
+		if (isSuccessRequest(resUserGroups)) {
+			const sortedUserGroups = handleSortData({orgKey: sortKey, sortType:sortType}, resUserGroups.data);
+			console.log('vao vao aofaofasfoasfdo',sortedUserGroups)
+			setUserGroups(sortedUserGroups);
+		}
+	}
+
+	const createNew = () => {
+		setSelectedGroup(null);
+		setTypeModal(newType);
+		setShowModal(true);
+	}
+
+	const viewDetail = (idx: number) => {
+		setSelectedGroup(userGroups[idx]);
+		setTypeModal(updateType);
+		setShowModal(true);
 	}
 
 	const handleSortTableColumn = (param: IHandleSortParam) => {
-		setLoading(true);
+		dispatch(AShowLoading());
 		setSortKey(param.orgKey);
-		console.log('param', param);
-		if (data) {
-			const sortedData = [...data].sort((a, b) => {
-				const res = param.sortType === 'DESC' ? 1 : -1;
-				return b[param.orgKey] > a[param.orgKey] ? res : -res;
-			});
-			setData(sortedData);
+		setSortType(param.sortType);
+		if (userGroups) {
+			const sortedUserGroups = handleSortData(param, userGroups);
+			setUserGroups(sortedUserGroups);
 		}
-		// Sort array
-		setLoading(false);
+		dispatch(AHideLoading());
 	}
 
-	const filter = async () => {
-		setLoading(true);
-		setSortKey('handleSortTableColumn');
-		try {
-			// const res = await listFolderFromDisk({
-			const res = await listSpecifyFolderFromDisk({
-				driverPath,
-				dropboxPath,
-				startTime: startTime ? startTime.format(DATETIME_FORMAT) : '',
-				endTime: endTime ? endTime.format(DATETIME_FORMAT) : '',
-			})
-			if (res.status === 200) {
-				const sortedData = [...res.data.data].sort((a, b) => {
-					const res = 1;
-					return b['handleSortTableColumn'] > a['handleSortTableColumn'] ? res : -res;
-				});
-				setData(sortedData);
-				if (res.data.data?.length === 0) {
-					setErrorMsg('Không có data.');
-				}
-			}
-		} catch (e) {
-			console.log(e);
-			setData([]);
-			setErrorMsg('Có lỗi xảy ra khi thực hiện Tìm kiếm. Bạn hãy chỉ định khoảng Tìm kiếm cụ thể hơn hoặc liên lạc với Admin để được hỗ trợ');
-		}
-		setLoading(false);
-	}
-
-	const toggleEditingDriverPath = () => {
-		setIsEditingDriverPath(!isEditingDriverPath);
-		putSearchFolderSetting({subkey: 'driver', value: driverPath});
-	}
-	const toggleEditingDropboxPath = () => {
-		setIsEditingDropboxPath(!isEditingDropboxPath);
-		putSearchFolderSetting({subkey: 'dropbox', value: dropboxPath})
-	}
-
-	console.log('props',props)
 	return (
 		<>
-			<Button
-				variant={'success'}
-				className="ms-3 text-nowrap miw-80"
-				onClick={filter}
-				disabled={loading}
-			>
-				{loading && <Spinner animation="border" size="sm" className="me-2" />}
-				Thêm
-			</Button>{' '}
+			<div className='w-100 d-flex justify-content-end'>
+				<Button
+					variant={'success'}
+					className="ms-3 text-nowrap miw-80"
+					onClick={createNew}
+					disabled={loading}
+				>
+					{loading && <Spinner animation="border" size="sm" className="me-2" />}
+					Thêm
+				</Button>{' '}
+			</div>
 			{loading ? (
 				<div className='align-middle text-center mt-5'>
 					<Spinner animation="border" size="sm" style={{ height: '3rem', width: '3rem' }} className="me-2" />
@@ -135,40 +89,31 @@ const RoleManager: ExtendedNextPage = (props) => {
 						<thead className='table-primary'>
 							<tr>
 								<th scope="col" className='w-30'>#</th>
-								<th scope="col" className=''>
+								<th scope="col" className='2-130'>
 									<SortableHeader
-										title='Thư mục'
-										orgKey='path'
-										sortKey={sortkey}
+										title='Tên role'
+										orgKey='name'
+										sortKey={sortKey}
 										handleSortTableColumn={handleSortTableColumn}
 									/>
 								</th>
-								<th scope="col" className='w-130'>
-									<SortableHeader
-										title='Thời gian cập nhật'
-										orgKey='lastModifiedFolder'
-										sortKey={sortkey}
-										handleSortTableColumn={handleSortTableColumn}
-									/>
-								</th>
-								<th scope="col" className='w-30'>Số file</th>
-								<th scope="col" className='w-30'>Trạng thái</th>
-								<th scope="col" className='w-30'>Thao tác</th>
+								<th scope="col" className=''>Danh sách mành hình</th>
 							</tr>
 						</thead>
 							<tbody>
-							{data && data?.length > 0 ? (
-									data.map((item, idx) => (
-										<tr key={idx + 1}>
+							{userGroups && userGroups?.length > 0 ? (
+									userGroups.map((item, idx) => (
+										<tr key={idx + 1} className="cursor-pointer" onDoubleClick={() => viewDetail(idx)}>
 											<th scope="row">{idx + 1}</th>
-											<td>{item.path}</td>
-											<td>{Moment.unix(parseFloat(item.lastModifiedFolder)).format('YYYY-MM-DD HH:mm')}</td>
-											<td>{item.files ? item.files.length : 0}</td>
-											<td className='miw-120'>Chưa tạo job</td>
+											<td>{item.name}</td>
 											<td>
-												<Button variant={'success'} onClick={createJob} className="ms-3 text-nowrap miw-80">
-													Tạo Job
-												</Button>{' '}
+												{item.permissions && item.permissions?.length > 0 && (
+													<span>
+														{item.permissions.map(function(id) {
+															return props.data.userPermissions[id] ? props.data.userPermissions[id].name : '';
+														}).join(', ')}
+													</span>
+												)}
 											</td>
 										</tr>
 									))
@@ -178,19 +123,41 @@ const RoleManager: ExtendedNextPage = (props) => {
 						</tbody>
 					</Table>
 				)}
+				{showModal && <RoleManagerModal
+					show={showModal}
+					type={typeModal}
+					handleShow={setShowModal}
+					permissions={props.data.userPermissions}
+					selectedGroup={selectedGroup}
+					refreshData={refreshData}
+				/>
+				}
 		</>
 	)
 }
 
-export const getStaticProps: GetStaticProps = async (context) => {
-  return {
-    props: {
-		}, // will be passed to the page component as props
-  }
+export async function getServerSideProps() {
+	const	[resUserGroups, resUserPermission] = await Promise.all([listUserGroups(), listUserPermissions()]);
+	if (isSuccessRequest(resUserGroups) && isSuccessRequest(resUserPermission)) {
+		const userPermissions = resUserPermission.data.reduce((acc, item) => {
+			acc[item.id] = item;
+			return acc;
+		}, {});
+		console.log('userPermissions', userPermissions);
+		const data = {
+			userGroups: resUserGroups.data,
+			userPermissions: userPermissions
+		}
+		return {
+			props: {
+				data
+			}
+		}
+	}
 }
 
 RoleManager.pageTitle = 'Quản lý role'
-RoleManager.activeLink = '/role_manager'
+RoleManager.activeLink = 'role_manager'
 RoleManager.breadcrumb = [
 	{ text: "Quản lý role", link: "/role_manager" },
 ]

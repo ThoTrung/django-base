@@ -1,10 +1,12 @@
 import React from 'react'
 import { Container, Structure } from '@blueupcode/components'
 import LayoutFloatingButton from '../floating-button/FloatingButton'
+import SimpleLoading from 'components/loading/simpleLoading'
 
 const BlankLayout: React.FC = ({ children }) => {
 	return (
 		<>
+			<SimpleLoading />
 			<Structure type="holder">
 				<Structure type="wrapper">
 					<Structure type="content">
@@ -12,7 +14,7 @@ const BlankLayout: React.FC = ({ children }) => {
 					</Structure>
 				</Structure>
 			</Structure>
-			<LayoutFloatingButton />
+			{/* <LayoutFloatingButton /> */}
 		</>
 	)
 }

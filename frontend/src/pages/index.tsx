@@ -20,7 +20,8 @@ import {
 } from '@fortawesome/free-solid-svg-icons'
 import { DATETIME_FORMAT, DATE_FORMAT, TIME_FORMAT } from 'constant/const';
 
-import SortableHeader, { IHandleSortParam } from 'components/table/sortable-header';
+import SortableHeader, { IHandleSortParam, handleSortData } from 'components/table/sortable-header';
+import { isSuccessRequest } from 'store/request/helper';
 interface ISearchFolderSetting {
 	driver: string;
 	dropbox: string;
@@ -64,21 +65,18 @@ const DashboardPage: ExtendedNextPage = (props) => {
 	const handleSortTableColumn = (param: IHandleSortParam) => {
 		setLoading(true);
 		setSortKey(param.orgKey);
-		console.log('param', param);
 		if (data) {
-			const sortedData = [...data].sort((a, b) => {
-				const res = param.sortType === 'DESC' ? 1 : -1;
-				return b[param.orgKey] > a[param.orgKey] ? res : -res;
-			});
+			const sortedData = handleSortData(param, data);
 			setData(sortedData);
 		}
-		// Sort array
 		setLoading(false);
 	}
 
 	const filter = async () => {
 		setLoading(true);
-		setSortKey('handleSortTableColumn');
+		const orgKey = 'lastModifiedFolder';
+		const sortType = 'DESC';
+		setSortKey(orgKey);
 		try {
 			// const res = await listFolderFromDisk({
 			const res = await listSpecifyFolderFromDisk({
@@ -87,11 +85,8 @@ const DashboardPage: ExtendedNextPage = (props) => {
 				startTime: startTime ? startTime.format(DATETIME_FORMAT) : '',
 				endTime: endTime ? endTime.format(DATETIME_FORMAT) : '',
 			})
-			if (res.status === 200) {
-				const sortedData = [...res.data.data].sort((a, b) => {
-					const res = 1;
-					return b['handleSortTableColumn'] > a['handleSortTableColumn'] ? res : -res;
-				});
+			if (isSuccessRequest(res)) {
+				const sortedData = handleSortData({orgKey, sortType}, res.data.data);
 				setData(sortedData);
 				if (res.data.data?.length === 0) {
 					setErrorMsg('Không có data.');

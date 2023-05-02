@@ -36,9 +36,6 @@ export function* watchIncrementAsync() {
 //   }
 // }
 
-// export default function* authSaga() {
-//   yield takeLatest('LOGIN_REQUEST', login);
-// }
 
 
 // post(API_URL, {email: "member1@gmail.com", password: "12345"})

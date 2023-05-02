@@ -1,8 +1,8 @@
 import { parseCookies, setCookie, destroyCookie } from 'nookies'
 import {
-  LOGIN_REQUEST,
   LOGIN_SUCCESS,
   LOGIN_FAILURE,
+  LOGOUT_SUCCESS
 } from "./actionTypes";
 
 import {
@@ -25,12 +25,6 @@ const initLoginState: ILoginState = {
 
 const loginReducer = (state=initLoginState, action: TLoginAction) => {
   switch(action.type) {
-    case LOGIN_REQUEST:
-      console.log('LOGIN_REQUEST');
-      return {
-        ...state,
-        pending: true,
-      };
     case LOGIN_SUCCESS:
       console.log('LOGIN_SUCCESS');
       return {
@@ -47,12 +41,20 @@ const loginReducer = (state=initLoginState, action: TLoginAction) => {
         token: null,
         error: action.payload.error
       };
+    case LOGOUT_SUCCESS:
+      console.log('LOGOUT_SUCCESS');
+      return {
+        pending: false,
+        token: null,
+        error: '',
+      };
     default:
       return {
         ...state,
       }
   }
 }
+
 // const layoutUserReducer = (state: UserInfo = UserInfoInitState, action: AnyAction) => {
 //   switch (action.type) {
 //     case `GET_USER_INFO`:

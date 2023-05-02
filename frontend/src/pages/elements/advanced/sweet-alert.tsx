@@ -211,7 +211,7 @@ const Swal5 = () => {
 const Swal6 = () => {
 	const handleClick = () => {
 		swal.fire({
-			position: 'top-end',
+			// position: 'top-end',
 			icon: 'success',
 			title: 'Your work has been saved',
 			showConfirmButton: false,

@@ -2,25 +2,20 @@ import React from 'react'
 import { Row, Col, Portlet, Form, Button, Spinner, Widget12 } from '@blueupcode/components'
 import { useForm, Controller } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { firebaseAuth } from 'components/firebase/firebaseClient'
-import { signInWithEmailAndPassword } from 'firebase/auth'
 import { swal } from 'components/sweetalert2/instance'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUserAlt } from '@fortawesome/free-solid-svg-icons'
 import * as yup from 'yup'
-import Router from 'next/router'
 import Link from 'next/link'
-import PAGE from 'config/page.config'
 import withGuest from 'components/auth/withGuest'
 import type { ExtendedNextPage } from '@blueupcode/components/types'
-import { incrementAsync, helloSaga } from '../store/sagas/menuSaga'
 
 import { useDispatch, useSelector } from "react-redux";
-import {
-	getSLoginPending,
-	getSLoginToken,
-} from "../store/auth/selectors";
-import { ALoginRequest } from "../store/auth/actions";
+import { ALoginSuccess } from "../store/auth/actions";
+import { postLogin } from 'store/request/auth'
+import { isSuccessRequest, isInvalid } from 'store/request/helper';
+import { AShowLoading, AHideLoading } from 'store/common/actions'
+import { getSLoading } from "store/common/selectors";
 
 
 const LoginPage: ExtendedNextPage = () => {
@@ -53,17 +48,8 @@ const validationSchema = yup.object().shape({
 })
 
 const LoginForm: React.FC = (props) => {
-	console.log(props);
 	const dispatch = useDispatch();
-  const token = useSelector(getSLoginToken);
-  const pending = useSelector(getSLoginPending);
-
-	
-	// console.log('todos',todos);
-	// Loading state
-	const [isLoading, setIsLoading] = React.useState(false)
-
-	// Initialize form validation with react-hook-form
+	const loading = useSelector(getSLoading);
 	const { control, handleSubmit, watch } = useForm<LoginFormInputs>({
 		resolver: yupResolver(validationSchema),
 		defaultValues: {
@@ -72,31 +58,34 @@ const LoginForm: React.FC = (props) => {
 		},
 	})
 
-	console.log(watch('email'));
 
 	// Function to handle form submission
 	const onSubmit = async (formData: LoginFormInputs) => {
 		// Show loading indicator
-		setIsLoading(true)
+		dispatch(AShowLoading());
 
 		try {
 			console.log('On submit');
 			const payload={email: formData.email, password:formData.password};
 			// Try to login with email and password
-			dispatch(ALoginRequest(payload)); 
+			// const res = await dispatch(ALoginRequest(payload));
+			const res = await postLogin(payload);
+			if (res) {
+				if (isSuccessRequest(res)) {
+					console.log('success', res.data);
+					dispatch(ALoginSuccess({token: res.data}));
+				} else {
+					console.log('Not success, ');
+				}
+			}
 
-			console.log('Finish login', token)
 		// 	const redirectUrl = (Router.query.redirect as string) || PAGE.homePagePath
-
 		// 	// Redirect to home page or url from the query parameter
 		// 	Router.push(redirectUrl)
 		} catch (error: any) {
-		// 	// Show alert message when error
-		// 	swal.fire({ text: error.message, icon: 'error' })
+			swal.fire({ text: error.message, icon: 'error' })
 		}
-
-		// Hide loading indicator
-		setIsLoading(false)
+		dispatch(AHideLoading());
 	}
 
 	return (
@@ -148,8 +137,8 @@ const LoginForm: React.FC = (props) => {
 				<span>
 					Don&apos;t have an account? <Link href="/register">Register</Link>
 				</span>
-				<Button type="submit" variant="label-primary" size="lg" width="widest" disabled={pending}>
-					{pending && <Spinner animation="border" size="sm" className="me-2" />}
+				<Button type="submit" variant="label-primary" size="lg" width="widest" disabled={loading}>
+					{loading && <Spinner animation="border" size="sm" className="me-2" />}
 					Login
 				</Button>
 			</div>
