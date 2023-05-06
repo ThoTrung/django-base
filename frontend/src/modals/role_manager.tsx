@@ -166,7 +166,7 @@ const RoleManagerModal = (props: Props) => {
                               checked={value.includes(parseInt(key))}
                               className="me-2"
                               onChange={(e) => {
-                                const isChecked = e.target.checked;
+                                // const isChecked = e.target.checked;
                                 const newValue = parseInt(e.target.value);
                                 onChange(
                                   value.includes(newValue)

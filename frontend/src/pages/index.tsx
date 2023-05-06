@@ -18,7 +18,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
 	faAngleDown,
 } from '@fortawesome/free-solid-svg-icons'
-import { DATETIME_FORMAT, DATE_FORMAT, TIME_FORMAT } from 'constant/const';
+import { DATETIME_FORMAT, DATE_FORMAT, TIME_FORMAT, DATE_FORMAT_DISPLAY } from 'constant/const';
 
 import SortableHeader, { IHandleSortParam, handleSortData } from 'components/table/sortable-header';
 import { isSuccessRequest } from 'store/request/helper';
@@ -157,7 +157,7 @@ const DashboardPage: ExtendedNextPage = (props) => {
 					</Form.Label>
 					<DateTimePicker
 						closeOnSelect
-						dateFormat={DATE_FORMAT}
+						dateFormat={DATE_FORMAT_DISPLAY}
 						timeFormat={TIME_FORMAT}
 						onChange={e => setStartTime(e)}
 						value={startTime}
@@ -167,7 +167,7 @@ const DashboardPage: ExtendedNextPage = (props) => {
 					</Form.Label>
 					<DateTimePicker
 						closeOnSelect
-						dateFormat={DATE_FORMAT}
+						dateFormat={DATE_FORMAT_DISPLAY}
 						timeFormat={TIME_FORMAT}
 						onChange={e => setEndTime(e)}
 						value={endTime}

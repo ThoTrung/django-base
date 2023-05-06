@@ -20,6 +20,7 @@ from user.serializers import (
     PermissionSerializer,
     GroupModifySerializer,
     BankSerializer,
+    MeSerializer,
 )
 
 from rest_framework import (
@@ -57,7 +58,7 @@ class CreateTokenView(ObtainAuthToken):
 
 class ManageUserView(generics.RetrieveUpdateAPIView):
     """Manage the authenticated user."""
-    serializer_class = UserSerializer
+    serializer_class = MeSerializer
     # authentication_classes = [authentication.TokenAuthentication]
     permission_classes = [permissions.IsAuthenticated]
 
@@ -92,3 +93,26 @@ class BankViewSet(viewsets.ReadOnlyModelViewSet):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = get_user_model().objects.all()
     serializer_class = UserSerializer
+
+    def get_queryset(self):
+        queryset = get_user_model().objects.all()
+
+        # Add your conditions to the queryset
+        name = self.request.query_params.get('name')
+        group = self.request.query_params.get('group')
+        status = self.request.query_params.get('status')
+        full_name = self.request.query_params.get('full_name')
+        try:
+            if name:
+                queryset = queryset.filter(name=name)
+            if full_name:
+                queryset = queryset.filter(full_name=full_name)
+            if status:
+                queryset = queryset.filter(status=status)
+            if group and int(group) > 0:
+                queryset = queryset.filter(groups__id=group)
+        except Exception:
+            return queryset
+            # raise e
+        return queryset
+

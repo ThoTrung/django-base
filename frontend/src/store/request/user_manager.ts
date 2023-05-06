@@ -1,3 +1,4 @@
+import { ICreateCUser } from 'store/request/user_manager';
 import requestInstance from "./base";
 
 export interface IUserPermissions {
@@ -48,10 +49,10 @@ export interface IFilterCuser {
   name: string,
   group: number,
   status: string,
-  fullName: string,
+  full_name: string,
 }
 
-export interface ICreateCuser {
+export interface ICreateCUser {
   email: string,
   password: string,
   name: string,
@@ -59,10 +60,29 @@ export interface ICreateCuser {
   gender: string,
   phone_number: string,
   address: string,
-  bank: number,
+  bank: number | null,
   bank_number: string,
   status: string,
   groups: number[],
+}
+
+export interface ICUser extends ICreateCUser {
+  id: number
+}
+
+export interface IUserBanks {
+  id: number,
+  name: string,
+}
+
+export const STATUS_CHOICES:any = {
+  W: 'Làm việc',
+  S: 'Đã nghỉ',
+}
+
+export const GENDER_CHOICES:any = {
+  M: 'Nam',
+  F: 'Nữ',
 }
 
 export const listCUsers = async (params: IFilterCuser) => {
@@ -70,12 +90,12 @@ export const listCUsers = async (params: IFilterCuser) => {
   return res;
 }
 
-export const createCusers = async (param: ICreateCuser) => {
+export const createCusers = async (param: ICreateCUser) => {
   const res = await requestInstance.post('api/user/cusers/', param);
   return res;
 }
 
-export const updateCusers = async (id: number, param: ICreateCuser) => {
+export const updateCusers = async (id: number, param: ICreateCUser) => {
   const res = await requestInstance.put(`api/user/cusers/${id}/`, param);
   return res;
 }

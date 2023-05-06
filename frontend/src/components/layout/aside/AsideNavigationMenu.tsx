@@ -8,15 +8,22 @@ import ASIDE_MENU from 'config/aside-menu.config'
 import AsideNavigationMenuLink from './AsideNavigationMenuLink'
 import AsideNavigationMenuSection from './AsideNavigationMenuSection'
 import AsideNavigationMenuSubmenu from './AsideNavigationMenuSubmenu'
+import { useSelector } from "react-redux";
+import { getSMyInfo } from 'store/myInfo/selectors'
 
 export interface AsideNavigationMenuProps {
 	menu: MenuReducerState
 }
 
 const AsideNavigationMenu: React.FC<AsideNavigationMenuProps> = ({ menu: { activeLinkPartial } }) => {
+	const myInfo = useSelector(getSMyInfo);
+	const permissions = (myInfo && myInfo.permissions) ? myInfo.permissions : [];
 	return (
 		<Menu>
 			{ASIDE_MENU.map((rootMenu) => {
+				if (!permissions.includes(rootMenu.name)) {
+					return null;
+				}
 				// Define root menu key
 				const rootMenuKey = rootMenu.name
 

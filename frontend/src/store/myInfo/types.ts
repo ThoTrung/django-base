@@ -5,8 +5,18 @@ import {
 } from "./actionTypes";
 
 export interface IMyInfo {
+  id: number,
   email: string,
   name: string,
+  full_name: string,
+  gender: string,
+  phone_number: string,
+  address: string,
+  bank: number,
+  bank_number: string,
+  status: string,
+  groups: number[],
+  permissions: string[],
 }
 
 export interface IState {

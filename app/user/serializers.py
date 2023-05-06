@@ -105,9 +105,36 @@ class UserSerializer(serializers.ModelSerializer):
         password = validated_data.pop('password', None)
         user = super().update(instance, validated_data)
 
-        if password:
+        if password and password != 'defaultPasswordNotUse':
             user.set_password(password)
             user.save()
 
         return user
 
+
+class MeSerializer (serializers.ModelSerializer):
+    permissions = serializers.SerializerMethodField()
+    class Meta:
+        model = get_user_model()
+        # fields = '__All__'
+        fields = [
+            'id',
+            'email',
+            'name',
+            'full_name',
+            'gender',
+            'phone_number',
+            'address',
+            'bank',
+            'bank_number',
+            'status',
+            'groups',
+            'permissions',
+        ]
+    def get_permissions(self, obj):
+        print(obj.user_permissions)
+        """
+        Extracts the permission codes from the user's permissions and returns them as an array.
+        """
+        return list(Permission.objects.filter(group__user=obj).values_list('codename', flat=True))
+        # return list(obj.user_permissions.values_list('codename', flat=True))

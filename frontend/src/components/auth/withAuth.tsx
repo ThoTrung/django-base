@@ -9,21 +9,36 @@ import {
 	getSLoginToken,
 } from '../../store/auth/selectors';
 
+import { getSMyInfo } from 'store/myInfo/selectors'
 import { AMyInfoRequest } from 'store/myInfo/actions'
 
+
 const withAuth = (PageComponent: ExtendedNextPage) => {
+
+	console.log('PageComponent.activeLink', PageComponent.activeLink)
+
 	// Initialize wrapper component
 	const WrapperComponent: ExtendedNextPage = (props) => {
 		const token = useSelector(getSLoginToken);
+		const myInfo = useSelector(getSMyInfo);
+		const [permissions, setPermissions] = React.useState<string[]>((myInfo && myInfo.permissions) ? myInfo.permissions : []);
 		const dispatch = useDispatch();
+		if (permissions.length === 0 && myInfo && myInfo.permissions?.length > 0) {
+			setPermissions(myInfo.permissions);
+		}
+		console.log('----------------------', myInfo ,permissions, PageComponent.activeLink)
+
 
 		React.useEffect(() => {
-		if (!token) {
-			return Router.push(PAGE.loginPagePath)
-		}
-		// Check token and get my info
-		dispatch(AMyInfoRequest())
-		},[token]);
+			if (!token) {
+				return Router.push(PAGE.loginPagePath)
+			}
+			if (!PageComponent.activeLink || (permissions.length > 0 && !permissions.includes(PageComponent.activeLink))) {
+				return Router.push(`/${permissions[0]}`)
+			}
+			// Check token and get my info
+			dispatch(AMyInfoRequest())
+		},[token, permissions]);
 		return <PageComponent {...props} />
 	}
 	return Object.assign(WrapperComponent, PageComponent)
