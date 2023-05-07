@@ -127,7 +127,7 @@ class ListSpecifyFolderFromDiskView(APIView):
     def _getListSpecialFileFromFolder(self, folderPathObj, startTime, endTime, ignoreFolders):
         res = {}
         for file in folderPathObj.rglob("*.*"):
-            intersectionFolders = ignoreFolders.intersection(file.parents[0].parts)
+            intersectionFolders = ignoreFolders.intersection(file.parts)
             if len(intersectionFolders) == 0:
                 lastModifiedTimeOfFile = file.lstat().st_mtime
                 if (not startTime or lastModifiedTimeOfFile >= startTime) \
