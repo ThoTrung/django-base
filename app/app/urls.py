@@ -48,6 +48,7 @@ urlpatterns = [
     path('api/user/', include('user.urls')),
     path('api/recipe/', include('recipe.urls')),
     path('api/job-managers/', include('job_manager.urls')),
+    path('api/customer-manager/', include('customer_manager.urls')),
 ]
 
 if settings.DEBUG:

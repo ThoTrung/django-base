@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'recipe',
     'job_manager',
     'django_celery_beat',
+    'customer_manager',
 ]
 
 MIDDLEWARE = [
