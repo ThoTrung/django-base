@@ -43,11 +43,14 @@ const DashboardPage: ExtendedNextPage = (props) => {
 	const [dropboxPath, setDropboxPath] = React.useState<string>('');
 	const [isEditingDropboxPath, setIsEditingDropboxPath] = React.useState<boolean>(false);
 	const [startTime, setStartTime] = React.useState<Moment.Moment>(Moment().startOf('day'));
-	const [endTime, setEndTime] = React.useState<Moment.Moment>(Moment());
+	const [endTime, setEndTime] = React.useState<Moment.Moment>();
 	const [loading, setLoading] = React.useState<boolean>(false);
 	const [errorMsg, setErrorMsg] = React.useState<string>('');
 	const [data, setData] = React.useState<IOneFolder[]>();
 	const [sortkey, setSortKey] = React.useState<string>('');
+	const [notificationStartTime, setNotificationStartTime] = React.useState<Moment.Moment>(Moment());
+	const [notificationData, setNotificationData] = React.useState<IOneFolder[]>([]);
+	
 
 	React.useEffect(() => {
 		getSearchFolderSetting()
@@ -57,6 +60,39 @@ const DashboardPage: ExtendedNextPage = (props) => {
 				setDropboxPath(data.data.dropbox);
 			})
 	}, [])
+
+	React.useEffect(() => {
+    // if ('Notification' in window && 'serviceWorker' in navigator) {
+    //   Notification.requestPermission().then((permission) => {
+    //     console.log('Notification permission:', permission);
+    //     if (permission === 'granted') {
+    //       console.log('FCM token ------:');
+    //     }
+    //   });
+    // }
+		const intervalId = setInterval(async() => {
+			try {
+				const res = await listSpecifyFolderFromDisk({
+					driverPath: '',
+					dropboxPath: '',
+					startTime: notificationStartTime.format(DATETIME_FORMAT),
+					endTime: '',
+				})
+				if (isSuccessRequest(res)) {
+					if (res.data.data?.length !== 0) {
+						setNotificationData(res.data.data);						
+					}
+				}
+			} catch (e) {
+				console.log(e);
+			}
+			// new Notification('title --------');
+		}, 300000);
+
+		return () => {
+      clearInterval(intervalId);
+    };
+  }, [notificationStartTime]);	
 
 	const createJob = () => {
 		return Router.push('/create_job')
@@ -86,6 +122,8 @@ const DashboardPage: ExtendedNextPage = (props) => {
 				endTime: endTime ? endTime.format(DATETIME_FORMAT) : '',
 			})
 			if (isSuccessRequest(res)) {
+				setNotificationData([]);
+				setNotificationStartTime(Moment());
 				const sortedData = handleSortData({orgKey, sortType}, res.data.data);
 				setData(sortedData);
 				if (res.data.data?.length === 0) {
@@ -188,52 +226,83 @@ const DashboardPage: ExtendedNextPage = (props) => {
 					<Spinner animation="border" size="sm" style={{ height: '3rem', width: '3rem' }} className="me-2" />
 				</div>
 				) : (
-					<Table bordered striped hover className='mt-4'>
-						<thead className='table-primary'>
-							<tr>
-								<th scope="col" className='w-30'>#</th>
-								<th scope="col" className=''>
-									<SortableHeader
-										title='Thư mục'
-										orgKey='path'
-										sortKey={sortkey}
-										handleSortTableColumn={handleSortTableColumn}
-									/>
-								</th>
-								<th scope="col" className='w-130'>
-									<SortableHeader
-										title='Thời gian cập nhật'
-										orgKey='lastModifiedFolder'
-										sortKey={sortkey}
-										handleSortTableColumn={handleSortTableColumn}
-									/>
-								</th>
-								<th scope="col" className='w-30'>Số file</th>
-								<th scope="col" className='w-30'>Trạng thái</th>
-								<th scope="col" className='w-30'>Thao tác</th>
-							</tr>
-						</thead>
-							<tbody>
-							{data && data?.length > 0 ? (
-									data.map((item, idx) => (
-										<tr key={idx + 1}>
-											<th scope="row">{idx + 1}</th>
-											<td>{item.path}</td>
-											<td>{Moment.unix(parseFloat(item.lastModifiedFolder)).format('YYYY-MM-DD HH:mm')}</td>
-											<td>{item.files ? item.files.length : 0}</td>
-											<td className='miw-120'>Chưa tạo job</td>
-											<td>
-												<Button variant={'success'} onClick={createJob} className="ms-3 text-nowrap miw-80">
-													Tạo Job
-												</Button>{' '}
-											</td>
+					<>
+						{notificationData && notificationData.length > 0 &&
+							<>
+								<Table bordered striped hover className='mt-4'>
+									<thead className='table-danger'>
+										<tr>
+											<th scope="col" className='w-30'>#</th>
+											<th scope="col" className=''>Thư mục (Data mới, Hãy bấm filter button để merge với những data cũ)</th>
+											<th scope="col" className='w-130'>Thời gian cập nhật</th>
+											<th scope="col" className='w-30'>Số file</th>
+											<th scope="col" className='w-30'>Trạng thái</th>
 										</tr>
-									))
-							) : (
-								<tr><div className=''>{errorMsg}</div></tr>
-							)}
-						</tbody>
-					</Table>
+									</thead>
+										<tbody>
+										{notificationData && notificationData?.length > 0 && (
+											notificationData.map((item, idx) => (
+												<tr key={idx + 1}>
+													<th scope="row">{idx + 1}</th>
+													<td>{item.path}</td>
+													<td>{Moment.unix(parseFloat(item.lastModifiedFolder)).format('YYYY-MM-DD HH:mm')}</td>
+													<td>{item.files ? item.files.length : 0}</td>
+													<td className='miw-120'>File mới</td>
+												</tr>
+											))
+										)}
+									</tbody>
+								</Table>
+							</>
+						}
+
+						<Table bordered striped hover className='mt-4'>
+							<thead className='table-primary'>
+								<tr>
+									<th scope="col" className='w-30'>#</th>
+									<th scope="col" className=''>
+										<SortableHeader
+											title='Thư mục'
+											orgKey='path'
+											sortKey={sortkey}
+											handleSortTableColumn={handleSortTableColumn}
+										/>
+									</th>
+									<th scope="col" className='w-130'>
+										<SortableHeader
+											title='Thời gian cập nhật'
+											orgKey='lastModifiedFolder'
+											sortKey={sortkey}
+											handleSortTableColumn={handleSortTableColumn}
+										/>
+									</th>
+									<th scope="col" className='w-30'>Số file</th>
+									<th scope="col" className='w-30'>Trạng thái</th>
+									<th scope="col" className='w-30'>Thao tác</th>
+								</tr>
+							</thead>
+								<tbody>
+								{data && data?.length > 0 ? (
+										data.map((item, idx) => (
+											<tr key={idx + 1}>
+												<th scope="row">{idx + 1}</th>
+												<td>{item.path}</td>
+												<td>{Moment.unix(parseFloat(item.lastModifiedFolder)).format('YYYY-MM-DD HH:mm')}</td>
+												<td>{item.files ? item.files.length : 0}</td>
+												<td className='miw-120'>Chưa tạo job</td>
+												<td>
+													<Button variant={'success'} onClick={createJob} className="ms-3 text-nowrap miw-80">
+														Tạo Job
+													</Button>{' '}
+												</td>
+											</tr>
+										))
+								) : (
+									<tr><div className=''>{errorMsg}</div></tr>
+								)}
+							</tbody>
+						</Table>
+					</>
 				)}
 		</>
 	)

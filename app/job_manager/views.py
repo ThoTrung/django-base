@@ -163,6 +163,10 @@ class ListSpecifyFolderFromDiskView(APIView):
         dropboxPathparam = request.query_params.get('dropboxPath', '')
         startTime = request.query_params.get('startTime', None)
         endTime = request.query_params.get('endTime', None)
+        if startTime == '':
+            startTime = None
+        if endTime == '':
+            endTime = None
         if startTime:
             startTime = datetime.strptime(startTime, DATETIME_FORMAT).timestamp()
         if endTime:
