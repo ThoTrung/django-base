@@ -18,7 +18,7 @@ class CustomerManagerViewSet(viewsets.ModelViewSet):
 
         queryset = CustomerManager.objects.all()
         if name != '':
-            queryset = queryset.filter(name=name)
+            queryset = queryset.filter(name__icontains=name)
         if email != '':
-            queryset = queryset.filter(email=email)
+            queryset = queryset.filter(email__icontains=email)
         return queryset

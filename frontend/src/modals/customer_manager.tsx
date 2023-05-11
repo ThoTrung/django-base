@@ -311,7 +311,7 @@ const CustomerManagerModal = (props: Props) => {
                 <Form.Group controlId="contact_channel">
                   <Row className='mt-2'>
                     <Col sm={5}>
-                      <Form.Label>Số ĐT:</Form.Label>
+                      <Form.Label>Kênh liên lạc:</Form.Label>
                     </Col>
                     <Col sm={7}>
                       <Form.Control

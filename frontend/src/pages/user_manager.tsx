@@ -212,7 +212,7 @@ const UserManagerPage: ExtendedNextPage<ICuserProps> = (props) => {
 									<th scope="row">{idx + 1}</th>
 									<td>{item.name}</td>
 									<td>{item.full_name}</td>
-									<td>{props.data.userGroups[item.groups[0]].name}</td>
+									<td>{item.groups[0] ? props.data.userGroups[item.groups[0]].name: ''}</td>
 									<td>{item.phone_number}</td>
 									<td>{item.email}</td>
 									<td>{item.address}</td>

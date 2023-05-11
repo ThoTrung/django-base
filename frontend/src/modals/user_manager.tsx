@@ -208,7 +208,7 @@ const UserManagerModal = (props: Props) => {
                 <Form.Group>
                   <Row className='mt-2'>
                     <Col sm={5}>
-                      <Form.Label>Role</Form.Label>
+                      <Form.Label>Role *:</Form.Label>
                     </Col>
                     <Col sm={7}>
                       <Form.Select

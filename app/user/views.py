@@ -104,9 +104,9 @@ class UserViewSet(viewsets.ModelViewSet):
         full_name = self.request.query_params.get('full_name')
         try:
             if name:
-                queryset = queryset.filter(name=name)
+                queryset = queryset.filter(name__icontains=name)
             if full_name:
-                queryset = queryset.filter(full_name=full_name)
+                queryset = queryset.filter(full_name__icontains=full_name)
             if status:
                 queryset = queryset.filter(status=status)
             if group and int(group) > 0:

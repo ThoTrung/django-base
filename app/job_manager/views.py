@@ -5,7 +5,6 @@ from drf_spectacular.utils import (
     OpenApiParameter,
     OpenApiTypes,
 )
-
 from rest_framework import (
     viewsets,
     mixins,
@@ -126,28 +125,33 @@ class ListSpecifyFolderFromDiskView(APIView):
     
     def _getListSpecialFileFromFolder(self, folderPathObj, startTime, endTime, ignoreFolders):
         res = {}
+        latestFolder = {}
         for file in folderPathObj.rglob("*.*"):
-            intersectionFolders = ignoreFolders.intersection(file.parts)
-            if len(intersectionFolders) == 0:
-                lastModifiedTimeOfFile = file.lstat().st_mtime
-                if (not startTime or lastModifiedTimeOfFile >= startTime) \
-                    and (not endTime or lastModifiedTimeOfFile <= endTime):
+            parent = file.parents[0]
+            parentPath = str(parent.resolve())
+            if parentPath not in latestFolder:
+                latestFolder[parentPath] = parent
 
-                    folderPath = str(file.parents[0].resolve())
-                    if folderPath not in res:
-                        res[folderPath] = {
-                            'files': [],
-                            'lastModifiedFolder': 0,
-                            'path': pathlib.Path(folderPath).as_posix().replace(
-                                '/LocalDrive', 'E:\\MyDrive'
-                            ).replace(
-                                '/LocalDropbox', 'E:\\Dropbox'
-                            ).replace('/', '\\')
-                        }
-                    res[folderPath]['files'].append(str(file.resolve()))
-
-                    if lastModifiedTimeOfFile > res[folderPath]['lastModifiedFolder']:
-                        res[folderPath]['lastModifiedFolder'] = lastModifiedTimeOfFile
+        for k,p in latestFolder.items():
+            lastModifiedTimeOfFolder = p.lstat().st_mtime
+            if (not startTime or lastModifiedTimeOfFolder >= startTime) \
+                and (not endTime or lastModifiedTimeOfFolder <= endTime):
+                intersectionFolders = ignoreFolders.intersection(k)
+                if len(intersectionFolders) == 0:
+                    res[k] = {
+                        'files': [],
+                        'lastModifiedFolder': lastModifiedTimeOfFolder,
+                        'path': pathlib.Path(k).as_posix().replace(
+                            '/LocalDrive', 'E:\\MyDrive'
+                        ).replace(
+                            '/LocalDropbox', 'E:\\Dropbox'
+                        ).replace('/', '\\')
+                    }
+                    for file in p.rglob("*.*"):
+                        lastModifiedTimeOfFile = file.lstat().st_mtime
+                        if (not startTime or lastModifiedTimeOfFolder >= startTime) \
+                            and (not endTime or lastModifiedTimeOfFolder <= endTime):
+                            res[k]['files'].append(str(file.resolve()))
 
         return list(res.values())
 
@@ -179,16 +183,14 @@ class ListSpecifyFolderFromDiskView(APIView):
         dropboxListFiles = []
         if driverPathparam == '' or driverPathparam == '.':
             for path in pathlib.Path(DRIVER_FOLDER).glob('- 02*/Input/*/'):
-                latestModifiedFolderTime = path.lstat().st_mtime
-                if path.is_dir() and (startTime is None or startTime <= latestModifiedFolderTime) and (endTime is None or endTime >= latestModifiedFolderTime):
+                if path.is_dir(): # and (startTime is None or startTime <= latestModifiedFolderTime) and (endTime is None or endTime >= latestModifiedFolderTime):
                     driverListFiles = driverListFiles + self._getListSpecialFileFromFolder(path, startTime, endTime, ignoreFolders)
         else:
             driverListFiles = self._getListSpecialFileFromFolder(pathlib.Path(DRIVER_FOLDER + driverPathparam), startTime, endTime, ignoreFolders)
 
         if dropboxPathparam == '' or dropboxPathparam == '.':
             for path in pathlib.Path(DROPBOX_FOLDER).glob('- 01*/Input/*/'):
-                latestModifiedFolderTime = path.lstat().st_mtime
-                if path.is_dir() and (startTime is None or startTime <= latestModifiedFolderTime) and (endTime is None or endTime >= latestModifiedFolderTime):
+                if path.is_dir(): # and (startTime is None or startTime <= latestModifiedFolderTime) and (endTime is None or endTime >= latestModifiedFolderTime):
                     dropboxListFiles = dropboxListFiles + self._getListSpecialFileFromFolder(path, startTime, endTime, ignoreFolders)
         else:
             dropboxListFiles = self._getListSpecialFileFromFolder(pathlib.Path(DROPBOX_FOLDER + dropboxPathparam), startTime, endTime, ignoreFolders)
