@@ -136,7 +136,7 @@ class ListSpecifyFolderFromDiskView(APIView):
             lastModifiedTimeOfFolder = p.lstat().st_mtime
             if (not startTime or lastModifiedTimeOfFolder >= startTime) \
                 and (not endTime or lastModifiedTimeOfFolder <= endTime):
-                intersectionFolders = ignoreFolders.intersection(k)
+                intersectionFolders = ignoreFolders.intersection(p.parts)
                 if len(intersectionFolders) == 0:
                     res[k] = {
                         'files': [],
@@ -150,7 +150,6 @@ class ListSpecifyFolderFromDiskView(APIView):
                     }
                     for file in p.glob("*.*"):
                         lastModifiedTimeOfFile = file.lstat().st_mtime
-                        print (file.name)
                         if (not startTime or lastModifiedTimeOfFile >= startTime) \
                             and (not endTime or lastModifiedTimeOfFile <= endTime) \
                             and file.name not in ignoreFolders:
