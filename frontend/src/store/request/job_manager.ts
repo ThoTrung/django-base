@@ -11,6 +11,7 @@ export interface IOneFolder {
   path: string;
   lastModifiedFolder: string;
   files: string[];
+  count: number;
 }
 
 export interface ISettingSearchFolder {

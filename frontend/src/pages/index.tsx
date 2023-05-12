@@ -246,7 +246,8 @@ const DashboardPage: ExtendedNextPage = (props) => {
 													<th scope="row">{idx + 1}</th>
 													<td>{item.path}</td>
 													<td>{Moment.unix(parseFloat(item.lastModifiedFolder)).format('YYYY-MM-DD HH:mm')}</td>
-													<td>{item.files ? item.files.length : 0}</td>
+													{/* <td>{item.files ? item.files.length : 0}</td> */}
+													<td>{item.count}</td>
 													<td className='miw-120'>File mới</td>
 												</tr>
 											))
@@ -288,7 +289,8 @@ const DashboardPage: ExtendedNextPage = (props) => {
 												<th scope="row">{idx + 1}</th>
 												<td>{item.path}</td>
 												<td>{Moment.unix(parseFloat(item.lastModifiedFolder)).format('YYYY-MM-DD HH:mm')}</td>
-												<td>{item.files ? item.files.length : 0}</td>
+												{/* <td>{item.files ? item.files.length : 0}</td> */}
+												<td>{item.count}</td>
 												<td className='miw-120'>Chưa tạo job</td>
 												<td>
 													<Button variant={'success'} onClick={createJob} className="ms-3 text-nowrap miw-80">

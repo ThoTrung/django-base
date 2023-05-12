@@ -140,6 +140,7 @@ class ListSpecifyFolderFromDiskView(APIView):
                 if len(intersectionFolders) == 0:
                     res[k] = {
                         'files': [],
+                        'count': 0,
                         'lastModifiedFolder': lastModifiedTimeOfFolder,
                         'path': pathlib.Path(k).as_posix().replace(
                             '/LocalDrive', 'E:\\MyDrive'
@@ -147,11 +148,14 @@ class ListSpecifyFolderFromDiskView(APIView):
                             '/LocalDropbox', 'E:\\Dropbox'
                         ).replace('/', '\\')
                     }
-                    for file in p.rglob("*.*"):
+                    for file in p.glob("*.*"):
                         lastModifiedTimeOfFile = file.lstat().st_mtime
-                        if (not startTime or lastModifiedTimeOfFolder >= startTime) \
-                            and (not endTime or lastModifiedTimeOfFolder <= endTime):
-                            res[k]['files'].append(str(file.resolve()))
+                        print (file.name)
+                        if (not startTime or lastModifiedTimeOfFile >= startTime) \
+                            and (not endTime or lastModifiedTimeOfFile <= endTime) \
+                            and file.name not in ignoreFolders:
+                            # res[k]['files'].append(str(file.resolve()))
+                            res[k]['count'] += 1
 
         return list(res.values())
 
