@@ -102,9 +102,7 @@ class ListSpecifyFolderFromDiskView(APIView):
             intersectionFolders = ignoreFolders.intersection(file.parents[0].parts)
             if len(intersectionFolders) == 0:
                 lastModifiedTimeOfFile = datetime.fromtimestamp(file.lstat().st_mtime).strftime('%Y-%m-%d %H:%M')
-                if (not startTime or lastModifiedTimeOfFile >= startTime) \
-                    and (not endTime or lastModifiedTimeOfFile <= endTime):
-
+                if lastModifiedTimeOfFile >= startTime and lastModifiedTimeOfFile <= endTime:
                     folderPath = str(file.parents[0].resolve())
                     if folderPath not in res:
                         res[folderPath] = {
@@ -125,36 +123,29 @@ class ListSpecifyFolderFromDiskView(APIView):
     
     def _getListSpecialFileFromFolder(self, folderPathObj, startTime, endTime, ignoreFolders):
         res = {}
-        latestFolder = {}
         for file in folderPathObj.rglob("*.*"):
             parent = file.parents[0]
             parentPath = str(parent.resolve())
-            if parentPath not in latestFolder:
-                latestFolder[parentPath] = parent
-
-        for k,p in latestFolder.items():
-            lastModifiedTimeOfFolder = p.lstat().st_mtime
-            if (not startTime or lastModifiedTimeOfFolder >= startTime) \
-                and (not endTime or lastModifiedTimeOfFolder <= endTime):
-                intersectionFolders = ignoreFolders.intersection(p.parts)
-                if len(intersectionFolders) == 0:
-                    res[k] = {
-                        'files': [],
-                        'count': 0,
-                        'lastModifiedFolder': lastModifiedTimeOfFolder,
-                        'path': pathlib.Path(k).as_posix().replace(
-                            '/LocalDrive', 'E:\\MyDrive'
-                        ).replace(
-                            '/LocalDropbox', 'E:\\Dropbox'
-                        ).replace('/', '\\')
-                    }
-                    for file in p.glob("*.*"):
-                        lastModifiedTimeOfFile = file.lstat().st_mtime
-                        if (not startTime or lastModifiedTimeOfFile >= startTime) \
-                            and (not endTime or lastModifiedTimeOfFile <= endTime) \
-                            and file.name not in ignoreFolders:
-                            # res[k]['files'].append(str(file.resolve()))
-                            res[k]['count'] += 1
+            if parentPath not in res:
+                lastModifiedTimeOfFolder = parent.lstat().st_mtime
+                if lastModifiedTimeOfFolder >= startTime and lastModifiedTimeOfFolder <= endTime:
+                    intersectionFolders = ignoreFolders.intersection(parent.parts)
+                    if len(intersectionFolders) == 0:
+                        res[parentPath] = {
+                            'files': [],
+                            'count': 0,
+                            'lastModifiedFolder': lastModifiedTimeOfFolder,
+                            'path': pathlib.Path(parentPath).as_posix().replace(
+                                '/LocalDrive', 'E:\\MyDrive'
+                            ).replace(
+                                '/LocalDropbox', 'E:\\Dropbox'
+                            ).replace('/', '\\')
+                        }
+                        for file in parent.glob("*.*"):
+                            lastModifiedTimeOfFile = file.lstat().st_mtime
+                            if lastModifiedTimeOfFile >= startTime and lastModifiedTimeOfFile <= endTime and file.name not in ignoreFolders:
+                                res[parentPath]['files'].append(str(file.resolve()))
+                                res[parentPath]['count'] += 1
 
         return list(res.values())
 
@@ -165,19 +156,15 @@ class ListSpecifyFolderFromDiskView(APIView):
         """
         DRIVER_FOLDER = '/LocalDrive/'
         DROPBOX_FOLDER = '/LocalDropbox/'
+        MIN_TIMESTAMP = 0
+        MAX_TIMESTAMP = 4839578483
 
         driverPathparam = request.query_params.get('driverPath', '')
         dropboxPathparam = request.query_params.get('dropboxPath', '')
         startTime = request.query_params.get('startTime', None)
         endTime = request.query_params.get('endTime', None)
-        if startTime == '':
-            startTime = None
-        if endTime == '':
-            endTime = None
-        if startTime:
-            startTime = datetime.strptime(startTime, DATETIME_FORMAT).timestamp()
-        if endTime:
-            endTime = datetime.strptime(endTime, DATETIME_FORMAT).timestamp()
+        startTime = MIN_TIMESTAMP if startTime == '' else datetime.strptime(startTime, DATETIME_FORMAT).timestamp()
+        endTime = MAX_TIMESTAMP if endTime == '' else datetime.strptime(endTime, DATETIME_FORMAT).timestamp()
 
         ignoreFolderSetting = UserSettingJob.objects.filter(key='ignore_folder').get()
         ignoreFolders = set(ignoreFolderSetting.value['folders'])
