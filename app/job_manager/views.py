@@ -176,14 +176,16 @@ class ListSpecifyFolderFromDiskView(APIView):
                 if path.is_dir(): # and (startTime is None or startTime <= latestModifiedFolderTime) and (endTime is None or endTime >= latestModifiedFolderTime):
                     driverListFiles = driverListFiles + self._getListSpecialFileFromFolder(path, startTime, endTime, ignoreFolders)
         else:
-            driverListFiles = self._getListSpecialFileFromFolder(pathlib.Path(DRIVER_FOLDER + driverPathparam), startTime, endTime, ignoreFolders)
+            driverPathparam = pathlib.Path(DRIVER_FOLDER + driverPathparam).as_posix().replace('\\', '/')
+            driverListFiles = self._getListSpecialFileFromFolder(pathlib.Path(driverPathparam), startTime, endTime, ignoreFolders)
 
         if dropboxPathparam == '' or dropboxPathparam == '.':
             for path in pathlib.Path(DROPBOX_FOLDER).glob('- 01*/Input/*/'):
                 if path.is_dir(): # and (startTime is None or startTime <= latestModifiedFolderTime) and (endTime is None or endTime >= latestModifiedFolderTime):
                     dropboxListFiles = dropboxListFiles + self._getListSpecialFileFromFolder(path, startTime, endTime, ignoreFolders)
         else:
-            dropboxListFiles = self._getListSpecialFileFromFolder(pathlib.Path(DROPBOX_FOLDER + dropboxPathparam), startTime, endTime, ignoreFolders)
+            dropboxPathparam = pathlib.Path(DROPBOX_FOLDER + dropboxPathparam).as_posix().replace('\\', '/')
+            dropboxListFiles = self._getListSpecialFileFromFolder(pathlib.Path(dropboxPathparam), startTime, endTime, ignoreFolders)
 
 
         listFiles = driverListFiles + dropboxListFiles
