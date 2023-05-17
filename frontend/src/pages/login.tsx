@@ -72,10 +72,8 @@ const LoginForm: React.FC = (props) => {
 			const res = await postLogin(payload);
 			if (res) {
 				if (isSuccessRequest(res)) {
-					console.log('success', res.data);
 					dispatch(ALoginSuccess({token: res.data}));
 				} else {
-					console.log('Not success, ');
 				}
 			}
 

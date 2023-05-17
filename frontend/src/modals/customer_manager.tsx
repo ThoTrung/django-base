@@ -6,6 +6,7 @@ import { modalType, newType, updateType, detailType } from 'constant/type'
 import { useDispatch } from "react-redux";
 import { AShowLoading, AHideLoading } from 'store/common/actions'
 import { useForm, Controller } from 'react-hook-form'
+import DateTimePicker from 'react-datetime'
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { isSuccessRequest } from 'store/request/helper'
@@ -17,6 +18,7 @@ import {
   updateCustomers,
   deleteCustomers
 } from 'store/request/customer_manager'
+import { DATETIME_FORMAT, DATE_FORMAT, TIME_FORMAT, DATE_FORMAT_DISPLAY } from 'constant/const';
 
 type Props = {
   show: boolean;
@@ -57,6 +59,8 @@ const CustomerManagerModal = (props: Props) => {
       pay_name: (props.selectedCustomer ? props.selectedCustomer.pay_name : ''),
       phone_number: (props.selectedCustomer ? props.selectedCustomer.phone_number : ''),
       contact_channel: (props.selectedCustomer ? props.selectedCustomer.contact_channel : ''),
+      state: (props.selectedCustomer ? props.selectedCustomer.state : ''),
+      deadline: (props.selectedCustomer ? props.selectedCustomer.deadline.substring(0, 5) : ''),
       // description: (props.selectedCustomer ? props.selectedCustomer.description : ''),
 		},
   })
@@ -89,6 +93,8 @@ const CustomerManagerModal = (props: Props) => {
       pay_name: formData.pay_name,
       phone_number: formData.phone_number,
       contact_channel: formData.contact_channel,
+      state: formData.state,
+      deadline: formData.deadline ? formData.deadline.format(TIME_FORMAT) : '',
       // description: formData.description,
     }
     // if (!isUpdateMode || changePassword) {
@@ -321,6 +327,60 @@ const CustomerManagerModal = (props: Props) => {
                       />
                       {invalid && <Form.Control.Feedback type="invalid">{error?.message}</Form.Control.Feedback>}
                       {!!serverErrors['contact_channel'] && <Form.Control.Feedback type="invalid">{serverErrors['contact_channel']}</Form.Control.Feedback>}
+                    </Col>
+                  </Row>
+                </Form.Group>
+              )}
+            />
+
+
+
+            <Controller
+              name="state"
+              control={control}
+              render={({ field, fieldState: { invalid, error } }) => (
+                <Form.Group controlId="state">
+                  <Row className='mt-2'>
+                    <Col sm={5}>
+                      <Form.Label>Múi giờ/bang:</Form.Label>
+                    </Col>
+                    <Col sm={7}>
+                      <Form.Control
+                        disabled={readOnly}
+                        isInvalid={invalid || !!serverErrors['state']}
+                        {...field}
+                      />
+                      {invalid && <Form.Control.Feedback type="invalid">{error?.message}</Form.Control.Feedback>}
+                      {!!serverErrors['state'] && <Form.Control.Feedback type="invalid">{serverErrors['state']}</Form.Control.Feedback>}
+                    </Col>
+                  </Row>
+                </Form.Group>
+              )}
+            />
+
+            <Controller
+              name="deadline"
+              control={control}
+              render={({ field, fieldState: { invalid, error } }) => (
+                <Form.Group controlId="deadline">
+                  <Row className='mt-2'>
+                    <Col sm={5}>
+                      <Form.Label>Deadline:</Form.Label>
+                    </Col>
+                    <Col sm={7}>
+
+                      <DateTimePicker
+                        closeOnSelect
+                        dateFormat={false}
+                        timeFormat={TIME_FORMAT}
+                        onChange={(date) => field.onChange(date)}
+                        value={field.value}
+                        initialViewMode={'time'}
+                        // onChange={e => setStartTime(e)}
+                        // value={startTime}
+                      />
+                      {invalid && <Form.Control.Feedback type="invalid">{error?.message}</Form.Control.Feedback>}
+                      {!!serverErrors['deadline'] && <Form.Control.Feedback type="invalid">{serverErrors['deadline']}</Form.Control.Feedback>}
                     </Col>
                   </Row>
                 </Form.Group>

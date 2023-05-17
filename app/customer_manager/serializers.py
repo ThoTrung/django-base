@@ -14,6 +14,8 @@ class CustomerManagerSeliazer(serializers.ModelSerializer):
             'pay_name',
             'phone_number',
             'contact_channel',
+            'state',
+            'deadline',
             'description',
         ]
         read_only_fields=['id']

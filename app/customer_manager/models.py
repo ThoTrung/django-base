@@ -18,6 +18,8 @@ class CustomerManager(BaseModel):
     pay_name = models.CharField(max_length=100, blank=False)
     phone_number = models.CharField(max_length=30, blank=True, null=True)
     contact_channel=models.CharField(max_length=255, blank=True, null=True)
+    state = models.CharField(max_length=255, blank=True, null=True)
+    deadline = models.TimeField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
 
     def __str__(self):

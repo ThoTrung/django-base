@@ -168,6 +168,7 @@ const CustomerManagerPage: ExtendedNextPage<ICustomerProps> = (props) => {
 								handleSortTableColumn={handleSortTableColumn}
 							/>
 						</th>
+						<th scope="col" className=''>Múi giờ/bang</th>
 						<th scope="col" className=''>Số expose</th>
 						<th scope="col" className=''>Style cố định</th>
 						<th scope="col" className=''>Tên thanh toán</th>
@@ -183,6 +184,7 @@ const CustomerManagerPage: ExtendedNextPage<ICustomerProps> = (props) => {
 									<td>{item.code}</td>
 									<td>{item.name}</td>
 									<td>{item.email}</td>
+									<td>{item.state}</td>
 									<td>{item.expose}</td>
 									<td>{item.style}</td>
 									<td>{item.pay_name}</td>

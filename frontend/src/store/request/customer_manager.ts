@@ -9,6 +9,8 @@ export interface ICreateCustomer {
   pay_name: string,
   phone_number: string,
   contact_channel: string,
+  state: string,
+  deadline: string,
   // description: string,
 }
 
