@@ -60,7 +60,7 @@ const CustomerManagerModal = (props: Props) => {
       phone_number: (props.selectedCustomer ? props.selectedCustomer.phone_number : ''),
       contact_channel: (props.selectedCustomer ? props.selectedCustomer.contact_channel : ''),
       state: (props.selectedCustomer ? props.selectedCustomer.state : ''),
-      deadline: (props.selectedCustomer ? props.selectedCustomer.deadline.substring(0, 5) : ''),
+      deadline: (props.selectedCustomer && props.selectedCustomer.deadline ? props.selectedCustomer.deadline.substring(0, 5) : ''),
       // description: (props.selectedCustomer ? props.selectedCustomer.description : ''),
 		},
   })
