@@ -19,6 +19,7 @@ import {
   deleteCustomers
 } from 'store/request/customer_manager'
 import { DATETIME_FORMAT, DATE_FORMAT, TIME_FORMAT, DATE_FORMAT_DISPLAY } from 'constant/const';
+import { string } from 'prop-types'
 
 type Props = {
   show: boolean;
@@ -83,7 +84,10 @@ const CustomerManagerModal = (props: Props) => {
 
   const onSubmit = async (formData: ICreateCustomer) => {
     dispatch(AShowLoading());
-    console.log('formData', formData);
+    let deadline = formData.deadline ? formData.deadline : '';
+    if (typeof formData.deadline !== 'string') {
+      deadline = deadline.format(TIME_FORMAT);
+    }
     const payload={
       code: formData.code,
       name: formData.name,
@@ -94,7 +98,7 @@ const CustomerManagerModal = (props: Props) => {
       phone_number: formData.phone_number,
       contact_channel: formData.contact_channel,
       state: formData.state,
-      deadline: formData.deadline ? formData.deadline.format(TIME_FORMAT) : '',
+      deadline: deadline,
       // description: formData.description,
     }
     // if (!isUpdateMode || changePassword) {
