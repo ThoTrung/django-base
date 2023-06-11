@@ -23,7 +23,12 @@ export interface IFilterCustomer {
   email: string,
 }
 
-export const listCustomers = async (params: IFilterCustomer) => {
+export const DEFAULT_FILTER_CUSTOMER = {
+  name: '',
+	email: '',
+}
+
+export const listCustomers = async (params: IFilterCustomer = DEFAULT_FILTER_CUSTOMER) => {
   const res = await requestInstance.get('api/customer-manager', {params: params});
   return res;
 }

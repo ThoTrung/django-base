@@ -14,6 +14,7 @@ import {
 	ICustomer,
 	IFilterCustomer,
 	listCustomers,
+	DEFAULT_FILTER_CUSTOMER,
 } from 'store/request/customer_manager';
 import { param } from 'react-dom-factories';
 import { useForm, Controller } from 'react-hook-form'
@@ -31,11 +32,6 @@ const validationSchema = yup.object().shape({
 	// No validate need for filter
 })
 
-const defaultParamFilter = {
-	name: '',
-	email: '',
-}
-
 const CustomerManagerPage: ExtendedNextPage<ICustomerProps> = (props) => {
 	const [showModal, setShowModal] = React.useState<boolean>(false);
 	const [errorMsg, setErrorMsg] = React.useState<string>('');
@@ -49,7 +45,7 @@ const CustomerManagerPage: ExtendedNextPage<ICustomerProps> = (props) => {
 
   const {control, handleSubmit} = useForm<IFilterCustomer>({
     resolver: yupResolver(validationSchema),
-		defaultValues: defaultParamFilter,
+		defaultValues: DEFAULT_FILTER_CUSTOMER,
   })
 
 	const refreshData = () => {
@@ -210,7 +206,7 @@ const CustomerManagerPage: ExtendedNextPage<ICustomerProps> = (props) => {
 
 
 export async function getServerSideProps() {
-	const	resCustomer = await listCustomers(defaultParamFilter);
+	const	resCustomer = await listCustomers();
 	if (isSuccessRequest(resCustomer)) {
 		const data = {
 			customers: resCustomer.data,

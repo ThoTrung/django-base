@@ -9,7 +9,18 @@ import type { ExtendedNextPage } from '@blueupcode/components/types'
 import { modalType, detailType, newType, updateType } from 'constant/type';
 import { isSuccessRequest } from 'store/request/helper'
 import SortableHeader, { IHandleSortParam, handleSortData } from 'components/table/sortable-header';
-import { listCUsers, listUserBanks, listUserGroups, IFilterCuser, ICUser, ICreateCUser, IUserGroups, IUserBanks,  STATUS_CHOICES } from 'store/request/user_manager';
+import {
+	listCUsers,
+	listUserBanks,
+	listUserGroups,
+	IFilterCuser,
+	ICUser,
+	ICreateCUser,
+	IUserGroups,
+	IUserBanks,
+	STATUS_CHOICES,
+	DEFAULT_FILTER_USER,
+} from 'store/request/user_manager';
 import { param } from 'react-dom-factories';
 import { useForm, Controller } from 'react-hook-form'
 import * as yup from 'yup'
@@ -32,13 +43,6 @@ const validationSchema = yup.object().shape({
 	// No validate need for filter
 })
 
-const defaultParamFilter = {
-	name: '',
-	group: 0,
-	status: '',
-	full_name: '',
-}
-
 const UserManagerPage: ExtendedNextPage<ICuserProps> = (props) => {
 	const [showModal, setShowModal] = React.useState<boolean>(false);
 	const [errorMsg, setErrorMsg] = React.useState<string>('');
@@ -52,7 +56,7 @@ const UserManagerPage: ExtendedNextPage<ICuserProps> = (props) => {
 
   const {control, handleSubmit} = useForm<IFilterCuser>({
     resolver: yupResolver(validationSchema),
-		defaultValues: defaultParamFilter,
+		defaultValues: DEFAULT_FILTER_USER,
   })
 
 	const refreshData = () => {
@@ -239,7 +243,7 @@ const UserManagerPage: ExtendedNextPage<ICuserProps> = (props) => {
 
 
 export async function getServerSideProps() {
-	const	[resCUsers, resUserGroups, resUserBanks] = await Promise.all([listCUsers(defaultParamFilter), listUserGroups(), listUserBanks()]);
+	const	[resCUsers, resUserGroups, resUserBanks] = await Promise.all([listCUsers(), listUserGroups(), listUserBanks()]);
 	if (isSuccessRequest(resCUsers) && isSuccessRequest(resUserGroups) && isSuccessRequest(resUserBanks)) {
 		const userGroups = resUserGroups.data.reduce((acc, item) => {
 			acc[item.id] = item;

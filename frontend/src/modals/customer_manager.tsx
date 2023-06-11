@@ -380,8 +380,6 @@ const CustomerManagerModal = (props: Props) => {
                         onChange={(date) => field.onChange(date)}
                         value={field.value}
                         initialViewMode={'time'}
-                        // onChange={e => setStartTime(e)}
-                        // value={startTime}
                       />
                       {invalid && <Form.Control.Feedback type="invalid">{error?.message}</Form.Control.Feedback>}
                       {!!serverErrors['deadline'] && <Form.Control.Feedback type="invalid">{serverErrors['deadline']}</Form.Control.Feedback>}

@@ -66,6 +66,13 @@ export interface ICreateCUser {
   groups: number[],
 }
 
+export const DEFAULT_FILTER_USER = {
+	name: '',
+	group: 0,
+	status: '',
+	full_name: '',
+}
+
 export interface ICUser extends ICreateCUser {
   id: number
 }
@@ -85,7 +92,7 @@ export const GENDER_CHOICES:any = {
   F: 'Nữ',
 }
 
-export const listCUsers = async (params: IFilterCuser) => {
+export const listCUsers = async (params: IFilterCuser = DEFAULT_FILTER_USER) => {
   const res = await requestInstance.get('api/user/cusers', {params: params});
   return res;
 }

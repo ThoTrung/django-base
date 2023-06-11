@@ -1,8 +1,6 @@
-from django.shortcuts import render
-from django.urls import path
+from rest_framework import viewsets
 from customer_manager.models import CustomerManager
 from customer_manager.serializers import CustomerManagerSeliazer
-from rest_framework import viewsets
 
 
 # Create your views here.

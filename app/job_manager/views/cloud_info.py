@@ -17,10 +17,10 @@ from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
-from .models import (
+from ..models import (
     JobManager, JobStatus, UserSettingJob
 )
-from . import serializers
+from .. import serializers
 
 DATETIME_FORMAT = '%Y-%m-%d %H:%M'
 

@@ -8,7 +8,8 @@ from rest_framework.routers import DefaultRouter
 from . import views
 
 router = DefaultRouter()
-router.register('', views.JobManagerViewSet)
+router.register('cloud', views.JobManagerViewSet)
+router.register('job', views.JobViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
