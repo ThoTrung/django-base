@@ -188,6 +188,10 @@ const CreateJobPage: ExtendedNextPage<ICreateJobProps> = (props) => {
     let res = null;
     let swalTitle = '';
     res = await createJob(payload as ICreateJob);
+
+    // Now it time for upload file
+    
+
     swalTitle = 'Tạo Job thành công'
     if (isSuccessRequest(res)) {
       swalSuccess(swalTitle);

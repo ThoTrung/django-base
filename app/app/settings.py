@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'drf_spectacular',
     'auditlog',
+    'django_tus',
     # 'simple_history',
     'core',
     'user',
@@ -145,6 +146,13 @@ MEDIA_URL = '/static/media/'
 
 MEDIA_ROOT = '/vol/web/media'
 STATIC_ROOT = '/vol/web/static'
+
+TUS_UPLOAD_DIR = os.path.join(BASE_DIR, 'tus_upload')
+TUS_DESTINATION_DIR = os.path.join(BASE_DIR, 'media', 'uploads')
+TUS_FILE_NAME_FORMAT = 'increment'  # Other options are: 'random-suffix', 'random', 'keep'
+TUS_EXISTING_FILE = 'error'  #  Other options are: 'overwrite',  'error', 'rename'
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field

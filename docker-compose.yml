@@ -48,22 +48,22 @@ services:
     depends_on:
       - db
   
-  celery:
-    restart: always
-    build:
-      context: .
-    command: celery -A app worker -l DEBUG --beat
-    volumes:
-      - ./app:/app
-    environment:
-      - DB_HOST=${DB_HOST}
-      - DB_NAME=${DB_NAME}
-      - DB_USER=${DB_USER}
-      - DB_PASS=${DB_PASS}
-    depends_on:
-      - db
-      - redis
-      - app
+  # celery:
+  #   restart: always
+  #   build:
+  #     context: .
+  #   command: celery -A app worker -l DEBUG --beat
+  #   volumes:
+  #     - ./app:/app
+  #   environment:
+  #     - DB_HOST=${DB_HOST}
+  #     - DB_NAME=${DB_NAME}
+  #     - DB_USER=${DB_USER}
+  #     - DB_PASS=${DB_PASS}
+  #   depends_on:
+  #     - db
+  #     - redis
+  #     - app
 
   frontend:
     build:
