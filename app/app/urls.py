@@ -22,8 +22,8 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
-from django_tus.views import TusUpload
-from tus_client_demo.views import DemoClientView
+# from django_tus.views import TusUpload
+# from tus_client_demo.views import DemoClientView
 
 from core import views as core_views
 from user import views as user_views
@@ -36,9 +36,9 @@ from rest_framework_simplejwt.views import (
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    
-    path('upload/', TusUpload.as_view(), name='tus_upload'),
-    path('upload/<uuid:resource_id>', TusUpload.as_view(), name='tus_upload_chunks'),
+
+    # path('upload/', TusUpload.as_view(), name='tus_upload'),
+    # path('upload/<uuid:resource_id>', TusUpload.as_view(), name='tus_upload_chunks'),
 
     path('api/health-check/', core_views.health_check, name='health-check'),
     path('api/schema/', SpectacularAPIView.as_view(), name='api-schema'),

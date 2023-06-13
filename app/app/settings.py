@@ -69,7 +69,7 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'django_extensions',
     'auditlog',
-    'django_tus',
+    # 'django_tus',
     # 'simple_history',
     'rest_framework_tus',
     'core',

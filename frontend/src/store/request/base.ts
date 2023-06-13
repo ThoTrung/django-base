@@ -11,6 +11,8 @@ import { swal } from 'components/sweetalert2/instance'
 import { AShowLoading, AHideLoading } from 'store/common/actions'
 import { put, call } from 'redux-saga/effects';
 
+console.log('apiUrl 11-----------------', apiUrl, process.browser);
+
 const requestInstance = Axios.create({
   baseURL: process.browser ? apiUrl : 'http://app:8000/',
   timeout: 300000,

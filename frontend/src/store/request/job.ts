@@ -32,7 +32,7 @@ export interface IJob extends ICreateJob {
 
 export const createJob = async (param: ICreateJob) => {
   const res = await requestInstance.post('api/job-managers/job/', param);
-  return res;
+  return res;z``
 }
 
 export const updateJob = async (id: number, param: ICreateJob) => {
