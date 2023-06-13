@@ -476,10 +476,15 @@ import '@uppy/dashboard/dist/style.min.css';
 
 const uppy = new Uppy({
   meta: { type: "avatar" },
-  // restrictions: { maxNumberOfFiles: 5 },
+  restrictions: {
+    allowedFileTypes: ['.jpg', '.png'],
+  },
   autoProceed: false
 });
-uppy.use(Tus, { endpoint: "http://localhost:8880/api/files/" });
+uppy.use(Tus, {
+  endpoint: "http://localhost:8880/api/files/",
+  chunkSize: 52428800,
+});
 
 uppy.on("complete", (result) => {
   const url = result.successful[0].uploadURL;
@@ -492,19 +497,12 @@ uppy.on("complete", (result) => {
 
 
 const CreateJobPage: ExtendedNextPage = (props) => {
-	// const uppy = React.useMemo(() => {
-  //   return new Uppy({
-  //     // restrictions: { maxNumberOfFiles: 3 },
-  //     autoProceed: false
-  //   });
-  // }, []);
-
   React.useEffect(() => {
     return () => uppy.close();
   }, []);
 	return (
 		<div>
-      <Dashboard uppy={uppy} plugins={["DragDrop"]} {...props} />
+      <Dashboard uppy={uppy} hideUploadButton={true} plugins={["DragDrop"]} {...props} />
     </div>
 	)
 }
