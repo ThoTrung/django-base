@@ -1,10 +1,6 @@
-<<<<<<< HEAD
-import React from 'react'
 import { Row, Col, ListGroup, Button, Modal, Form } from '@blueupcode/components'
-=======
 import React, { useEffect } from 'react';
 import withAuth from 'components/auth/withAuth'
->>>>>>> 3aa7f2d (test)
 import type { ExtendedNextPage } from '@blueupcode/components/types'
 import withAuth from 'components/auth/withAuth'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
