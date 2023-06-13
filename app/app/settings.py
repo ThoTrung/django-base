@@ -13,6 +13,23 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 import os
 from pathlib import Path
 from datetime import timedelta
+from datetime import datetime
+# from sicksid_tus.storage import TusStorage
+
+def tus_upload_folder(instance, filename):
+    current_datetime = datetime.now()
+    folder_name = current_datetime.strftime("%Y/%m/%d")
+    return f'tus_uploads/{folder_name}/{filename}'
+
+BASE_DIR='/app/app'
+
+TUS_UPLOAD_DIR = os.path.join(BASE_DIR, 'tus_upload')
+TUS_DESTINATION_DIR = os.path.join(BASE_DIR, 'media', 'uploads')
+TUS_FILE_NAME_FORMAT = 'increment'  # Other options are: 'random-suffix', 'random', 'keep'
+TUS_EXISTING_FILE = 'error'  #  Other options are: 'overwrite',  'error', 'rename'
+
+# TUS_UPLOAD_DIR = '/app/app'#tus_upload_folder
+# REST_FRAMEWORK_TUS['UPLOAD_DIR'] = tus_upload_folder
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -48,9 +65,11 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'rest_framework_simplejwt',
     'drf_spectacular',
+    'django_extensions',
     'auditlog',
     'django_tus',
     # 'simple_history',
+    'rest_framework_tus',
     'core',
     'user',
     'recipe',
@@ -68,6 +87,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'auditlog.middleware.AuditlogMiddleware',
+    'rest_framework_tus.middleware.TusMiddleware',
 ]
 
 ROOT_URLCONF = 'app.urls'

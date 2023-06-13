@@ -9,4 +9,5 @@ django-auditlog==2.2.2
 celery==5.2.7
 redis==4.5.4
 django-celery-beat==2.5.0
-django-tus==0.5.0
+django-extensions==3.2.3
+sicksid-drf-tus==1.22.0

@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 import React from 'react'
 import { Row, Col, ListGroup, Button, Modal, Form } from '@blueupcode/components'
+=======
+import React, { useEffect } from 'react';
+import withAuth from 'components/auth/withAuth'
+>>>>>>> 3aa7f2d (test)
 import type { ExtendedNextPage } from '@blueupcode/components/types'
 import withAuth from 'components/auth/withAuth'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -461,6 +466,46 @@ const CreateJobPage: ExtendedNextPage<ICreateJobProps> = (props) => {
         </div>
       </Form>
 		</div>
+import Uppy from '@uppy/core';
+import Tus from "@uppy/tus";
+import { Dashboard } from '@uppy/react';
+
+// Don't forget the CSS: core and the UI components + plugins you are using.
+import '@uppy/core/dist/style.min.css';
+import '@uppy/dashboard/dist/style.min.css';
+
+const uppy = new Uppy({
+  meta: { type: "avatar" },
+  // restrictions: { maxNumberOfFiles: 5 },
+  autoProceed: false
+});
+uppy.use(Tus, { endpoint: "http://localhost:8880/api/files/" });
+
+uppy.on("complete", (result) => {
+  const url = result.successful[0].uploadURL;
+  // store.dispatch({
+  //   type: 'SET_USER_AVATAR_URL',
+  //   payload: { url },
+  // })
+  console.log(url);
+});
+
+
+const CreateJobPage: ExtendedNextPage = (props) => {
+	// const uppy = React.useMemo(() => {
+  //   return new Uppy({
+  //     // restrictions: { maxNumberOfFiles: 3 },
+  //     autoProceed: false
+  //   });
+  // }, []);
+
+  React.useEffect(() => {
+    return () => uppy.close();
+  }, []);
+	return (
+		<div>
+      <Dashboard uppy={uppy} plugins={["DragDrop"]} {...props} />
+    </div>
 	)
 }
 
