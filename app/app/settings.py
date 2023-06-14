@@ -21,12 +21,10 @@ def tus_upload_folder(instance, filename):
     folder_name = current_datetime.strftime("%Y/%m/%d")
     return f'tus_uploads/{folder_name}/{filename}'
 
-BASE_DIR='/app/app'
-
-TUS_UPLOAD_DIR = os.path.join(BASE_DIR, 'tus_upload')
-TUS_DESTINATION_DIR = os.path.join(BASE_DIR, 'media', 'uploads')
-TUS_FILE_NAME_FORMAT = 'increment'  # Other options are: 'random-suffix', 'random', 'keep'
-TUS_EXISTING_FILE = 'error'  #  Other options are: 'overwrite',  'error', 'rename'
+TUS_UPLOAD_DIR = tus_upload_folder
+# TUS_DESTINATION_DIR = os.path.join(BASE_DIR, 'media', 'uploads')
+# TUS_FILE_NAME_FORMAT = 'increment'  # Other options are: 'random-suffix', 'random', 'keep'
+# TUS_EXISTING_FILE = 'error'  #  Other options are: 'overwrite',  'error', 'rename'
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800
 

@@ -221,6 +221,7 @@ const CreateJobPage: ExtendedNextPage<ICreateJobProps> = (props) => {
     let res = null;
     let swalTitle = '';
     res = await createJob(payload as ICreateJob);
+    console.log(res);
     if (isSuccessRequest(res)) {
       const resFiles = await uppy.upload();
       console.log ('resFiles ------', resFiles);
@@ -245,6 +246,7 @@ const CreateJobPage: ExtendedNextPage<ICreateJobProps> = (props) => {
     const files = event.target.files;
     const acceptedFiles = [];
     console.log('1111');
+    uppy.cancelAll();
     if (files && files.length > 0) {
       // Filter file
       console.log('2222');

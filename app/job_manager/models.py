@@ -97,3 +97,5 @@ class Job(BaseModel):
     editor_price = models.FloatField(blank=True, null=True)
     status = models.CharField(max_length=50, choices=STATUS_CHOICES)
     source = models.CharField(max_length=50, choices=SOURCE_CHOICES)
+    des_path = models.CharField(max_length=255, blank=False, default='')
+    src_path = models.CharField(max_length=255, blank=True, null=True)

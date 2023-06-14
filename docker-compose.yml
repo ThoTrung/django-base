@@ -23,7 +23,9 @@ services:
     build:
       context: .
       args:
-        - DEV=true
+        DEV: ${DEV}
+        USER_ID: ${USER_ID}
+        GROUP_ID: ${GROUP_ID}
     ports:
       - "8000:8000"
     restart: always

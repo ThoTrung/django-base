@@ -6,7 +6,8 @@ ENV PYTHONUNBUFFERED 1
 COPY ./requirements.txt /tmp/requirements.txt
 COPY ./requirements.dev.txt /tmp/requirements.dev.txt
 COPY ./scripts /scripts
-COPY ./app /app
+# For production only after
+# COPY ./app /app
 WORKDIR /app
 EXPOSE 8000
 
@@ -21,19 +22,26 @@ RUN python -m venv /py && \
         then /py/bin/pip install -r /tmp/requirements.dev.txt ; \
     fi && \
     rm -rf /tmp && \
-    apk del .tmp-build-deps && \
-    adduser \
+    apk del .tmp-build-deps
+
+RUN adduser \
         --disabled-password \
         --no-create-home \
-        django-user && \
-    mkdir -p /vol/web/media && \
+        www-data
+ARG USER_ID
+ARG GROUP_ID
+RUN apk add --no-cache shadow
+RUN groupmod --gid ${GROUP_ID} www-data && \
+    usermod -u ${USER_ID} www-data
+RUN mkdir -p /vol/web/media && \
     mkdir -p /vol/web/static && \
-    chown -R django-user:django-user /vol && \
+    chown -R www-data:www-data . && \
+    chown -R www-data:www-data /vol && \
     chmod -R 755 /vol && \
     chmod -R +x /scripts
 
 ENV PATH="/scripts:/py/bin:$PATH"
 
-# USER django-user
+USER www-data
 
 CMD ["run.sh"]
