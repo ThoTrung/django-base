@@ -12,7 +12,7 @@ services:
     volumes:
       - dev-db-data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "5433:5432"
     restart: always
     environment:
       - POSTGRES_DB=${DB_NAME}
@@ -31,7 +31,7 @@ services:
     restart: always
     volumes:
       - ./app:/app
-      - dev-static-data:/vol/web
+      - ../web:/vol/web
       - ../LocalDropbox:/LocalDropbox
       - ../LocalDrive:/LocalDrive
       - ../Working:/Working
@@ -98,4 +98,3 @@ services:
 
 volumes:
   dev-db-data:
-  dev-static-data:

@@ -26,7 +26,7 @@ https://django-auditlog.readthedocs.io/en/latest/usage.html
 # Clear docker none
 docker rmi $(docker images -a|grep "<none>"|awk '$1=="<none>" {print $3}')
 
-# Theme 
+# Theme
 https://upmin-react.blueupcode.com/
 
 
@@ -61,3 +61,8 @@ from pathlib import Path
 for path in Path('/LocalDrive/').glob('sub*/Input/*'):
     if path.is_dir():
         print(os.listdir(path))
+
+
+# Transistion
+https://hashedin.com/blog/a-guide-to-managing-finite-state-machine-using-django-fsm/
+

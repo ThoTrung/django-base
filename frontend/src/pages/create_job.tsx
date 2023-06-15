@@ -49,14 +49,14 @@ uppy.use(Tus, {
   chunkSize: 52428800,
 });
 
-uppy.on("complete", (result) => {
-  const url = result.successful[0].uploadURL;
-  // store.dispatch({
-  //   type: 'SET_USER_AVATAR_URL',
-  //   payload: { url },
-  // })
-  console.log(url);
-});
+// uppy.on("complete", (result) => {
+//   const url = result.successful[0].uploadURL;
+//   // store.dispatch({
+//   //   type: 'SET_USER_AVATAR_URL',
+//   //   payload: { url },
+//   // })
+//   console.log(url);
+// });
 
 const configData = {
 	folder_path: {
@@ -157,7 +157,7 @@ const validationSchema = yup.object().shape(validateObject);
 
 const CreateJobPage: ExtendedNextPage<ICreateJobProps> = (props) => {
   const [serverErrors, setServerErrors] = React.useState<any>({});
-  const [selectedFiles, setSelectedFiles] = React.useState<any>([]);
+  const [fileGUIDs, setFileGUIDs] = React.useState<string[]>([]);
 
   const dispatch = useDispatch();
 
@@ -215,25 +215,33 @@ const CreateJobPage: ExtendedNextPage<ICreateJobProps> = (props) => {
     Object.keys(configData).forEach(key => {
       payload[key] = formData[key];
     });
-    console.log('payload', payload);
     // if (!isUpdateMode || changePassword) {
     // }
-    let res = null;
-    let swalTitle = '';
-    res = await createJob(payload as ICreateJob);
-    console.log(res);
-    if (isSuccessRequest(res)) {
-      const resFiles = await uppy.upload();
+    let fileGUIDsTemp = fileGUIDs;
+    const resFiles = await uppy.upload();
+    if (resFiles.failed.length === 0) {
+      resFiles.successful.forEach(item => {
+        const urlElements = item.uploadURL.split('/').filter(n => n);
+        fileGUIDsTemp.push(urlElements.pop());
+      })
+
+      payload['files'] = fileGUIDsTemp;
+      setFileGUIDs(fileGUIDsTemp);
+
+      console.log('payload ------', payload);
+
       console.log ('resFiles ------', resFiles);
-    }
-    // Now it time for upload file
+      const res = await createJob(payload as ICreateJob);
+      console.log(res);
 
-
-    swalTitle = 'Tạo Job thành công'
-    if (isSuccessRequest(res)) {
-      swalSuccess(swalTitle);
-    } else { // Error: 4xx
-      setServerErrors(res.data);
+      const swalTitle = 'Tạo Job thành công'
+      if (isSuccessRequest(res)) {
+        swalSuccess(swalTitle);
+      } else { // Error: 4xx
+        setServerErrors(res.data);
+      }
+    } else {
+      // There are some file that are not successfull upload. Do something.
     }
     dispatch(AHideLoading());
   }
@@ -245,16 +253,15 @@ const CreateJobPage: ExtendedNextPage<ICreateJobProps> = (props) => {
   const handleFolderSelection = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     const acceptedFiles = [];
-    console.log('1111');
     uppy.cancelAll();
+    let fileGeneratedIDsTmp:string[] = [];
     if (files && files.length > 0) {
       // Filter file
-      console.log('2222');
       for (let i = 0; i < files.length; ++i) {
         const file = files[i];
         if (ALLOW_FILE_TYPES.includes(file.type)) {
           acceptedFiles.push(file);
-          uppy.addFile({
+          const generatedId = uppy.addFile({
             source: 'Manual',
             name: file.name,
             type: file.type,
@@ -268,7 +275,6 @@ const CreateJobPage: ExtendedNextPage<ICreateJobProps> = (props) => {
     if (acceptedFiles.length > 0) {
       console.log('4444');
       setValue('file_number', acceptedFiles.length);
-      setSelectedFiles(acceptedFiles);
       delete serverErrors['folder_path'];
       setServerErrors({...serverErrors});
     } else {
@@ -276,7 +282,6 @@ const CreateJobPage: ExtendedNextPage<ICreateJobProps> = (props) => {
       setValue('file_number', 0);
       setServerErrors({...serverErrors, folder_path: 'Thư mục không có file thỏa mãn, hãy chắc chắn rằng thư mục bạn đang chọn có các file .jpg, .png'})
     }
-    console.log('---------------------', files, acceptedFiles);
   };
 
 	return (

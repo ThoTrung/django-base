@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from datetime import datetime
+from pathlib import Path
+import shutil
 
 from .models import (
     JobManager,
@@ -7,6 +9,8 @@ from .models import (
     UserSettingJob,
     Job,
 )
+
+from rest_framework_tus import api
 
 class JobManagerSerializer(serializers.ModelSerializer):
 
@@ -44,6 +48,22 @@ class JobSerializer(serializers.ModelSerializer):
         validated_data['status'] = 'creating'
         validated_data['source'] = 'manual'
         today = datetime.today()
-        validated_data['des_path'] = f'${today.year}/${today.month}/${today.day}/'
+        des_folder_path = f'/Working/{today.year}/{today.month}/{today.day}'
+        validated_data['des_path'] = des_folder_path
+        job_names = validated_data['name'].split(', ')
+
+        for job_name in job_names:
+            path_check = Path(f'{des_folder_path}/{job_name}')
+            if (not path_check.exists()):
+                path_check.mkdir(parents=True)
+
+
+        fileObjs = api.get_tus_upload_by_guids(validated_data['files'])
+        for fileObj in fileObjs:
+            src_path = Path(fileObj.temporary_file_path)
+            for job_name in job_names:
+                des_path = Path(f'{des_folder_path}/{job_name}/{fileObj.filename}')
+                shutil.copy(src_path, des_path)
+
         job = super().create(validated_data)
         return job
