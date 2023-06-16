@@ -66,3 +66,6 @@ for path in Path('/LocalDrive/').glob('sub*/Input/*'):
 # Transistion
 https://hashedin.com/blog/a-guide-to-managing-finite-state-machine-using-django-fsm/
 
+# Logger
+https://cheat.readthedocs.io/en/latest/django/logging.html
+https://xxx-cook-book.gitbooks.io/django-cook-book/content/Logs/Handlers/FileHandler/timed-rotating-file-handler.html

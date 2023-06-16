@@ -2,6 +2,7 @@ from rest_framework import serializers
 from datetime import datetime
 from pathlib import Path
 import shutil
+import logging
 
 from .models import (
     JobManager,
@@ -11,6 +12,11 @@ from .models import (
 )
 
 from rest_framework_tus import api
+
+
+logger = logging.getLogger(__name__)
+
+print(__name__)
 
 class JobManagerSerializer(serializers.ModelSerializer):
 
@@ -45,6 +51,8 @@ class JobSerializer(serializers.ModelSerializer):
         read_only_fields = ['id']
 
     def create(self, validated_data):
+        logger.warning("Create Job ......")
+
         validated_data['status'] = 'creating'
         validated_data['source'] = 'manual'
         today = datetime.today()
