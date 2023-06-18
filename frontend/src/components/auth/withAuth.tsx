@@ -26,8 +26,6 @@ const withAuth = (PageComponent: ExtendedNextPage) => {
 		if (permissions.length === 0 && myInfo && myInfo.permissions?.length > 0) {
 			setPermissions(myInfo.permissions);
 		}
-		console.log('----------------------', myInfo ,permissions, PageComponent.activeLink)
-
 
 		React.useEffect(() => {
 			if (!token) {

@@ -35,6 +35,9 @@ class Command(BaseCommand):
             },{
                 'code': 'export_invoice',
                 'name': 'Xuất hóa đơn',
+            },{
+                'code': 'email_manager',
+                'name': 'Quản lý email',
             }
         )
 

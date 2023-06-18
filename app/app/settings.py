@@ -74,6 +74,7 @@ INSTALLED_APPS = [
     'job_manager',
     'django_celery_beat',
     'customer_manager',
+    'email_manager',
 ]
 
 MIDDLEWARE = [
@@ -227,10 +228,13 @@ LOGGING = {
     },
     "handlers": {
         "file": {
-            "class": "logging.FileHandler",
-            "filename": "general.log",
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            "filename": "debug.log",
             # "level": "DEBUG",
             "formatter": "verbose",
+            'when': 'D', # this specifies the interval
+            'interval': 1, # defaults to 1, only necessary for other values 
+            'backupCount': 10, # how many backup file to keep, 10 days
         },
     },
     "formatters": {

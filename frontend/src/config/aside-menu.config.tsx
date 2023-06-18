@@ -2,13 +2,7 @@ import { ReactNode } from 'react'
 import { Badge } from '@blueupcode/components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
-	faAdjust,
-	faChartPie,
 	faUsers,
-	faDesktop,
-	faDice,
-	faIcons,
-	faPalette,
 	faMoneyBill1,
 	faFileInvoiceDollar,
 	faChartSimple,
@@ -17,6 +11,7 @@ import {
 	faCloud,
 	faUserCheck,
 	faPeopleRoof,
+	faMailBulk,
 } from '@fortawesome/free-solid-svg-icons'
 //https://fontawesome.com/search
 /*
@@ -88,6 +83,13 @@ const ASIDE_MENU: ASIDE_MENU_INTERFACE = [
 		title: 'Xuất hóa đơn',
 		link: '/export_invoice',
 		icon: <FontAwesomeIcon icon={faFileInvoiceDollar} />,
+	},
+	{
+		type: 'link',
+		name: 'email_manager',
+		title: 'Quản lý email',
+		link: '/email_manager',
+		icon: <FontAwesomeIcon icon={faMailBulk} />,
 	},
 ]
 
