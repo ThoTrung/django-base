@@ -3,12 +3,12 @@ from datetime import datetime
 from pathlib import Path
 import shutil
 import logging
+from django.db import transaction
 
 from .models import (
     JobManager,
-    JobStatus,
-    UserSettingJob,
     Job,
+    JobHistory,
 )
 
 from rest_framework_tus import api
@@ -45,32 +45,59 @@ class JobSerializer(serializers.ModelSerializer):
             'customer_price',
             'editor_price',
             'des_path',
-            'src_path'
+            'src_path',
+            'source',
         ]
         read_only_fields = ['id']
 
     def create(self, validated_data):
-        logger.warning("Create Job ......")
+        # try:
+        with transaction.atomic():
+            record_exists = Job.objects.filter(folder_path=validated_data['folder_path']).exists()
+            if record_exists:
+                raise serializers.ValidationError({
+                    'folder_path': f"Đã tồn tại Job với đường dẫn: {validated_data['folder_path']}",
+                })
 
-        validated_data['status'] = 'creating'
-        # validated_data['source'] = 'manual'
-        today = datetime.today()
-        des_folder_path = f'/Working/{today.year}/{today.month}/{today.day}'
-        validated_data['des_path'] = des_folder_path
-        job_names = validated_data['name'].split(', ')
+            validated_data['status'] = 'new'
+            today = datetime.today()
+            des_folder_path = f'/Working/{today.year}/{today.month}/{today.day}'
+            validated_data['des_path'] = des_folder_path
 
-        for job_name in job_names:
-            path_check = Path(f'{des_folder_path}/{job_name}')
-            if (not path_check.exists()):
-                path_check.mkdir(parents=True)
+            job = super().create(validated_data)
+            request = self.context.get('request', None)
+            cur_user = None
+            if request:
+                cur_user = request.user
+            JobHistory.objects.create(job=job, status='new', creator=cur_user)
 
-
-        fileObjs = api.get_tus_upload_by_guids(validated_data['files'])
-        for fileObj in fileObjs:
-            src_path = Path(fileObj.temporary_file_path)
+            job_names = validated_data['name'].split(', ')
             for job_name in job_names:
-                des_path = Path(f'{des_folder_path}/{job_name}/{fileObj.filename}')
-                shutil.copy(src_path, des_path)
+                path_check = Path(f'{des_folder_path}/{job_name}')
+                if (not path_check.exists()):
+                    path_check.mkdir(parents=True)
 
-        job = super().create(validated_data)
-        return job
+            src_files = []
+            if validated_data['source'] == 'manual':
+                fileObjs = api.get_tus_upload_by_guids(validated_data['files'])
+                src_files = [{
+                    'path': fileObj.temporary_file_path,
+                    'name': fileObj.filename
+                } for fileObj in fileObjs]
+            else:
+                src_files = [{
+                    'path': file,
+                    'name': file.split('/')[-1]
+                } for file in validated_data['files']]
+
+            print('---------')
+            print(src_files)
+            for src_file in src_files:
+                src_path = Path(src_file['path'])
+                for job_name in job_names:
+                    des_path = Path(f"{des_folder_path}/{job_name}/{src_file['name']}")
+                    shutil.copy(src_path, des_path)
+
+            return job
+        # except Exception as e:
+        #     logger.error(f"Error create job {str(e)}")

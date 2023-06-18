@@ -40,15 +40,24 @@ requestInstance.interceptors.request.use(function (config) {
 
 requestInstance.interceptors.response.use(response => {
   // isLoading = false;
-  return response;
-}, error => {
-  // isLoading = false;
-  if (isInvalid(error.response)) {
-    return error.response;
-  } else if (isUnauthenticate(error.response)) {
-    swal.fire({ text: 'Thông tin đăng nhập không đúng. Xin vui lòng đăng nhập lại', icon: 'error' })
+  if (response) {
+    return response;
   } else {
-    swal.fire({ text: 'Có lỗi xảy ra. Vui long liên hệ Admin.', icon: 'error' })
+    swal.fire({ text: 'Có lỗi xảy ra. Vui long liên hệ Admin để xử lý.', icon: 'error' })
+  }
+}, error => {
+  console.log('error .....', error)
+  // isLoading = false;
+  if (error.response) {
+    if (isInvalid(error.response)) {
+      return error.response;
+    } else if (isUnauthenticate(error.response)) {
+      swal.fire({ text: 'Thông tin đăng nhập không đúng. Xin vui lòng đăng nhập lại', icon: 'error' })
+    } else {
+      swal.fire({ text: 'Có lỗi xảy ra. Vui long liên hệ Admin.', icon: 'error' })
+    }
+  } else {
+    swal.fire({ text: 'Có lỗi xảy ra với server. Vui long liên hệ Admin.', icon: 'error' })
   }
   return null;
   // throw error;

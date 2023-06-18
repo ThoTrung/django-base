@@ -217,6 +217,10 @@ export async function getServerSideProps() {
 			}
 		}
 	}
+	return {
+    props: {
+    }
+  }
 }
 
 CustomerManagerPage.pageTitle = 'Quản lý khách hàng'

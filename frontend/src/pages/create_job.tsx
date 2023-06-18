@@ -34,29 +34,6 @@ import {
 import { DATETIME_FORMAT, DATE_FORMAT, TIME_FORMAT, NUMBER_ARRAY_10, ALLOW_FILE_TYPES } from 'constant/const';
 import { getSCreateJob } from 'store/c2c/selectors';
 
-
-const uppy = new Uppy({
-  id: 'create_job_uppy',
-  meta: { type: "avatar" },
-  // restrictions: {
-  //   allowedFileTypes: ['.jpg', '.png'],
-  // },
-  autoProceed: false
-});
-uppy.use(Tus, {
-  endpoint: `/api/files/`,
-  chunkSize: 52428800,
-});
-
-// uppy.on("complete", (result) => {
-//   const url = result.successful[0].uploadURL;
-//   // store.dispatch({
-//   //   type: 'SET_USER_AVATAR_URL',
-//   //   payload: { url },
-//   // })
-//   console.log(url);
-// });
-
 const configData = {
 	folder_path: {
     type: 'file',
@@ -158,6 +135,17 @@ const CreateJobPage: ExtendedNextPage<ICreateJobProps> = (props) => {
   const [serverErrors, setServerErrors] = React.useState<any>({});
   const [fileGUIDs, setFileGUIDs] = React.useState<string[]>([]);
   const [isRetry, setIsRetry] = React.useState<boolean>(false);
+
+  const uppyTmp = new Uppy({
+    id: 'create_job_uppy',
+    meta: { type: "avatar" },
+    autoProceed: false
+  });
+  uppyTmp.use(Tus, {
+    endpoint: `/api/files/`,
+    chunkSize: 52428800,
+  });
+  const [uppy, setUppy] = React.useState<Uppy>(uppyTmp);
   // const [selectedCreateJob, setSelectedCreaetJob] = React.useState<string[]>([]);
   
   
@@ -166,10 +154,37 @@ const CreateJobPage: ExtendedNextPage<ICreateJobProps> = (props) => {
   const source = router.query?.source ?? 'manual';
   const selectedCreateJob = useSelector(getSCreateJob);
 
+  // uppy.on("complete", (result) => {
+//   const url = result.successful[0].uploadURL;
+//   // store.dispatch({
+//   //   type: 'SET_USER_AVATAR_URL',
+//   //   payload: { url },
+//   // })
+//   console.log(url);
+// });
+
   React.useEffect(() => {
-    console.log('2222222222 clo')
     return () => uppy.close();
   }, []);
+
+  // useEffect(() => {
+  //   const handleRouteChange = (url: string, { shallow }) => {
+  //     console.log(uppy.close());
+  //     console.log(
+  //       `App is changing to ${url} ${
+  //         shallow ? 'with' : 'without'
+  //       } shallow routing`
+  //     )
+  //   }
+ 
+  //   router.events.on('routeChangeStart', handleRouteChange)
+ 
+  //   // If the component is unmounted, unsubscribe
+  //   // from the event with the `off` method:
+  //   return () => {
+  //     router.events.off('routeChangeStart', handleRouteChange)
+  //   }
+  // }, [router])
 
   const defaultValue = {};
   Object.keys(configData).forEach(key => {
@@ -216,46 +231,50 @@ const CreateJobPage: ExtendedNextPage<ICreateJobProps> = (props) => {
   }
 
 	const onSubmit = async (formData: any) => {
-    dispatch(AShowLoading());
-    const payload={}
-    Object.keys(configData).forEach(key => {
-      payload[key] = formData[key];
-    });
-    payload['source'] = source;
+    try {
+      dispatch(AShowLoading());
+      const payload={}
+      Object.keys(configData).forEach(key => {
+        payload[key] = formData[key];
+      });
+      payload['source'] = source;
 
-    if (source === 'auto') {
-      payload['files'] = selectedCreateJob['files'] ?? [];
-    } else {
-      // Upload file and handle resume
-      const resFiles = await uppy.upload();
-      let fileGUIDsTemp = fileGUIDs;
-  
-      if (resFiles.successful.length > 0) {
-        resFiles.successful.forEach(item => {
-          console.log('---------111111111', item)
-          const urlElements = item.uploadURL.split('/').filter(n => n);
-          fileGUIDsTemp.push(urlElements.pop());
-        })
-        setFileGUIDs(fileGUIDsTemp);
-      }
-      
-      if (resFiles.failed.length === 0) {
-        payload['files'] = fileGUIDsTemp;
-        setIsRetry(false);
+      if (source === 'auto') {
+        payload['files'] = selectedCreateJob['files'] ?? [];
       } else {
-        // Need to retry.
-        setIsRetry(true);
+        // Upload file and handle resume
+        const resFiles = await uppy.upload();
+        let fileGUIDsTemp = fileGUIDs;
+    
+        if (resFiles.successful.length > 0) {
+          resFiles.successful.forEach(item => {
+            console.log('---------111111111', item)
+            const urlElements = item.uploadURL.split('/').filter(n => n);
+            fileGUIDsTemp.push(urlElements.pop());
+          })
+          setFileGUIDs(fileGUIDsTemp);
+        }
+        
+        if (resFiles.failed.length === 0) {
+          payload['files'] = fileGUIDsTemp;
+          setIsRetry(false);
+        } else {
+          // Need to retry.
+          setIsRetry(true);
+        }
       }
-    }
 
-    const res = await createJob(payload as ICreateJob);
-    const swalTitle = 'Tạo Job thành công'
-    if (isSuccessRequest(res)) {
-      swalSuccess(swalTitle);
-    } else { // Error: 4xx
-      setServerErrors(res.data);
+      const res = await createJob(payload as ICreateJob);
+      const swalTitle = 'Tạo Job thành công'
+      if (isSuccessRequest(res)) {
+        swalSuccess(swalTitle);
+      } else { // Error: 4xx
+        setServerErrors(res.data);
+      }
+    } catch(e) {
+    } finally {
+      dispatch(AHideLoading());
     }
-    dispatch(AHideLoading());
   }
 
   const handleCancel = () => {
@@ -297,246 +316,250 @@ const CreateJobPage: ExtendedNextPage<ICreateJobProps> = (props) => {
   };
 
 	return (
-    <div className='d-flex'>
-      <div className='w-xlg'>
-        <Form onSubmit={handleSubmit(onSubmit, onErrors)} className="d-grid gap-3">
-          {Object.keys(configData).map(key => {
+    <>
+    {Object.keys(props).length !== 0 && 
+      <div className='d-flex'>
+        <div className='w-xlg'>
+          <Form onSubmit={handleSubmit(onSubmit, onErrors)} className="d-grid gap-3">
+            {Object.keys(configData).map(key => {
 
-            switch(configData[key].type) {
-              case 'file':
-                return (
-                  <Controller
-                    key={key}
-                    name={key}
-                    control={control}
-                    render={({ field, fieldState: { invalid, error } }) => (
-                      <Form.Group controlId={key}>
-                        <Row className='mt-2'>
-                          <Col sm={12}>
-                            <div className='d-flex align-items-center'>
-                              <Form.Label className='w-sm mb-0'>{configData[key].display_name}</Form.Label>
-                              <div className={configData[key].classNames ?? 'fr-1'}>
-                                <Form.Control
-                                  disabled={configData[key].readonly ?? false}
-                                  type='text'
-                                  // disabled={readOnly}
-                                  isInvalid={invalid || !!serverErrors[key]}
-                                  {...field}
-                                />
-                                {invalid && <Form.Control.Feedback type="invalid">{error?.message}</Form.Control.Feedback>}
-                                {!!serverErrors[key] && <Form.Control.Feedback type="invalid">{serverErrors[key]}</Form.Control.Feedback>}
-                              </div>
-                              {source !== 'auto' && 
-                                <div className='align-self-start'>
-                                  <label htmlFor="forderInput" className='btn btn-success ms-2'>Duyệt thư mục</label>
-                                  <input
-                                    type="file"
-                                    id="forderInput"
-                                    onChange={(e) => {
-                                      handleFolderSelection(e, key);
-                                    }}
-                                    accept={configData[key].allow_file_type ?? null}
-                                    hidden
-                                    webkitdirectory="true"
-                                    directory
-                                    multiple
+              switch(configData[key].type) {
+                case 'file':
+                  return (
+                    <Controller
+                      key={key}
+                      name={key}
+                      control={control}
+                      render={({ field, fieldState: { invalid, error } }) => (
+                        <Form.Group controlId={key}>
+                          <Row className='mt-2'>
+                            <Col sm={12}>
+                              <div className='d-flex align-items-center'>
+                                <Form.Label className='w-sm mb-0'>{configData[key].display_name}</Form.Label>
+                                <div className={configData[key].classNames ?? 'fr-1'}>
+                                  <Form.Control
+                                    disabled={configData[key].readonly ?? false}
+                                    type='text'
+                                    // disabled={readOnly}
+                                    isInvalid={invalid || !!serverErrors[key]}
+                                    {...field}
                                   />
+                                  {invalid && <Form.Control.Feedback type="invalid">{error?.message}</Form.Control.Feedback>}
+                                  {!!serverErrors[key] && <Form.Control.Feedback type="invalid">{serverErrors[key]}</Form.Control.Feedback>}
                                 </div>
-                              }
-                            </div>
-                          </Col>
-                        </Row>
-                      </Form.Group>
-                    )}
-                  />
-                );
-              case 'select':
-                const selected_list = props.data[configData[key].selected_list];
-                return (
-                  <Controller
-                    key={key}
-                    name={key}
-                    control={control}
-                    render={({ field, fieldState: { invalid, error } }) => (
-                      <Form.Group controlId={key}>
-                        <Row className='mt-2'>
-                          <Col sm={12}>
-                            <div className='d-flex align-items-center'>
-                            <Form.Label className='w-sm mb-0'>{configData[key].display_name}</Form.Label>
-                            <div className={configData[key].classNames ?? 'fr-1'}>
-                                <Form.Select
-                                  disabled={configData[key].readonly ?? false}
-                                  defaultValue=""
-                                  {...field}
-                                  onChange={(e) => {
-                                    console.log('on change 111')
-                                    field.onChange(e);
-                                    onChangeSelect(e.target.value, key);
-                                  }}
-                                >
-                                  <option value=""></option>
-                                  {Object.keys(selected_list).map((k: string) => (
-                                    <option key={k} value={k} selected={configData[key].default_value && k==configData[key].default_value}>{selected_list[k].name}</option>
-                                  ))}
-                                </Form.Select>
-                                {invalid && <Form.Control.Feedback type="invalid">{error?.message}</Form.Control.Feedback>}
-                                {!!serverErrors[key] && <Form.Control.Feedback type="invalid">{serverErrors[key]}</Form.Control.Feedback>}
+                                {source !== 'auto' && 
+                                  <div className='align-self-start'>
+                                    <label htmlFor="forderInput" className='btn btn-success ms-2'>Duyệt thư mục</label>
+                                    <input
+                                      type="file"
+                                      id="forderInput"
+                                      onChange={(e) => {
+                                        handleFolderSelection(e, key);
+                                      }}
+                                      accept={configData[key].allow_file_type ?? null}
+                                      hidden
+                                      webkitdirectory="true"
+                                      directory
+                                      multiple
+                                    />
+                                  </div>
+                                }
                               </div>
-                            </div>
-                          </Col>
-                        </Row>
-                      </Form.Group>
-                    )}
-                  />
-                )
-              case 'textarea':
-                return (
-                  <Controller
-                    key={key}
-                    name={key}
-                    control={control}
-                    render={({ field, fieldState: { invalid, error } }) => (
-                      <Form.Group controlId={key}>
-                        <Row className='mt-2'>
-                          <Col sm={12}>
-                            <div className='d-flex align-items-center'>
+                            </Col>
+                          </Row>
+                        </Form.Group>
+                      )}
+                    />
+                  );
+                case 'select':
+                  const selected_list = props.data[configData[key].selected_list];
+                  return (
+                    <Controller
+                      key={key}
+                      name={key}
+                      control={control}
+                      render={({ field, fieldState: { invalid, error } }) => (
+                        <Form.Group controlId={key}>
+                          <Row className='mt-2'>
+                            <Col sm={12}>
+                              <div className='d-flex align-items-center'>
                               <Form.Label className='w-sm mb-0'>{configData[key].display_name}</Form.Label>
                               <div className={configData[key].classNames ?? 'fr-1'}>
-                                <Form.Control
-                                  disabled={configData[key].readonly ?? false}
-                                  as="textarea"
-                                  // type={configData[key].type ?? 'text'}
-                                  isInvalid={invalid || !!serverErrors[key]}
-                                  {...field}
+                                  <Form.Select
+                                    disabled={configData[key].readonly ?? false}
+                                    defaultValue=""
+                                    {...field}
+                                    onChange={(e) => {
+                                      console.log('on change 111')
+                                      field.onChange(e);
+                                      onChangeSelect(e.target.value, key);
+                                    }}
+                                  >
+                                    <option value=""></option>
+                                    {Object.keys(selected_list).map((k: string) => (
+                                      <option key={k} value={k} selected={configData[key].default_value && k==configData[key].default_value}>{selected_list[k].name}</option>
+                                    ))}
+                                  </Form.Select>
+                                  {invalid && <Form.Control.Feedback type="invalid">{error?.message}</Form.Control.Feedback>}
+                                  {!!serverErrors[key] && <Form.Control.Feedback type="invalid">{serverErrors[key]}</Form.Control.Feedback>}
+                                </div>
+                              </div>
+                            </Col>
+                          </Row>
+                        </Form.Group>
+                      )}
+                    />
+                  )
+                case 'textarea':
+                  return (
+                    <Controller
+                      key={key}
+                      name={key}
+                      control={control}
+                      render={({ field, fieldState: { invalid, error } }) => (
+                        <Form.Group controlId={key}>
+                          <Row className='mt-2'>
+                            <Col sm={12}>
+                              <div className='d-flex align-items-center'>
+                                <Form.Label className='w-sm mb-0'>{configData[key].display_name}</Form.Label>
+                                <div className={configData[key].classNames ?? 'fr-1'}>
+                                  <Form.Control
+                                    disabled={configData[key].readonly ?? false}
+                                    as="textarea"
+                                    // type={configData[key].type ?? 'text'}
+                                    isInvalid={invalid || !!serverErrors[key]}
+                                    {...field}
+                                  />
+                                  {invalid && <Form.Control.Feedback type="invalid">{error?.message}</Form.Control.Feedback>}
+                                  {!!serverErrors[key] && <Form.Control.Feedback type="invalid">{serverErrors[key]}</Form.Control.Feedback>}
+                                </div>
+                              </div>
+                            </Col>
+                          </Row>
+                        </Form.Group>
+                      )}
+                    />
+                  )
+                case 'timepicker':
+                  return (
+                    <Controller
+                      key={key}
+                      name={key}
+                      control={control}
+                      render={({ field, fieldState: { invalid, error } }) => (
+                        <Form.Group controlId={key}>
+                          <Row className='mt-2'>
+                            <Col sm={12}>
+                              <div className='d-flex align-items-center'>
+                                <Form.Label className='w-sm mb-0'>{configData[key].display_name}</Form.Label>
+                                <div className={configData[key].classNames ?? 'fr-1'}>
+                                <DateTimePicker
+                                  closeOnSelect
+                                  dateFormat={false}
+                                  timeFormat={TIME_FORMAT}
+                                  onChange={(date) => field.onChange(date)}
+                                  value={field.value}
+                                  initialViewMode={'time'}
                                 />
                                 {invalid && <Form.Control.Feedback type="invalid">{error?.message}</Form.Control.Feedback>}
                                 {!!serverErrors[key] && <Form.Control.Feedback type="invalid">{serverErrors[key]}</Form.Control.Feedback>}
+                                </div>
                               </div>
-                            </div>
-                          </Col>
-                        </Row>
-                      </Form.Group>
-                    )}
-                  />
-                )
-              case 'timepicker':
-                return (
-                  <Controller
-                    key={key}
-                    name={key}
-                    control={control}
-                    render={({ field, fieldState: { invalid, error } }) => (
-                      <Form.Group controlId={key}>
-                        <Row className='mt-2'>
-                          <Col sm={12}>
-                            <div className='d-flex align-items-center'>
-                              <Form.Label className='w-sm mb-0'>{configData[key].display_name}</Form.Label>
-                              <div className={configData[key].classNames ?? 'fr-1'}>
-                              <DateTimePicker
-                                closeOnSelect
-                                dateFormat={false}
-                                timeFormat={TIME_FORMAT}
-                                onChange={(date) => field.onChange(date)}
-                                value={field.value}
-                                initialViewMode={'time'}
-                              />
-                              {invalid && <Form.Control.Feedback type="invalid">{error?.message}</Form.Control.Feedback>}
-                              {!!serverErrors[key] && <Form.Control.Feedback type="invalid">{serverErrors[key]}</Form.Control.Feedback>}
+                            </Col>
+                          </Row>
+                        </Form.Group>
+                      )}
+                    />
+                  )
+                case 'number':
+                  return (
+                    <Controller
+                      key={key}
+                      name={key}
+                      control={control}
+                      render={({ field, fieldState: { invalid, error } }) => (
+                        <Form.Group controlId={key}>
+                          <Row className='mt-2'>
+                            <Col sm={12}>
+                              <div className='d-flex align-items-center'>
+                                <Form.Label className='w-sm mb-0'>{configData[key].display_name}</Form.Label>
+                                <div className={configData[key].classNames ?? 'fr-1'}>
+                                  <Form.Control
+                                    disabled={configData[key].readonly ?? false}
+                                    type='number'
+                                    isInvalid={invalid || !!serverErrors[key]}
+                                    min={configData[key].min}
+                                    max={configData[key].max}
+                                    {...field}
+                                  />
+                                  {invalid && <Form.Control.Feedback type="invalid">{error?.message}</Form.Control.Feedback>}
+                                  {!!serverErrors[key] && <Form.Control.Feedback type="invalid">{serverErrors[key]}</Form.Control.Feedback>}
+                                </div>
+                                {configData[key].post_display && (
+                                  <div className='ms-2'>{configData[key].post_display}</div>
+                                )}
                               </div>
-                            </div>
-                          </Col>
-                        </Row>
-                      </Form.Group>
-                    )}
-                  />
-                )
-              case 'number':
-                return (
-                  <Controller
-                    key={key}
-                    name={key}
-                    control={control}
-                    render={({ field, fieldState: { invalid, error } }) => (
-                      <Form.Group controlId={key}>
-                        <Row className='mt-2'>
-                          <Col sm={12}>
-                            <div className='d-flex align-items-center'>
-                              <Form.Label className='w-sm mb-0'>{configData[key].display_name}</Form.Label>
-                              <div className={configData[key].classNames ?? 'fr-1'}>
-                                <Form.Control
-                                  disabled={configData[key].readonly ?? false}
-                                  type='number'
-                                  isInvalid={invalid || !!serverErrors[key]}
-                                  min={configData[key].min}
-                                  max={configData[key].max}
-                                  {...field}
-                                />
-                                {invalid && <Form.Control.Feedback type="invalid">{error?.message}</Form.Control.Feedback>}
-                                {!!serverErrors[key] && <Form.Control.Feedback type="invalid">{serverErrors[key]}</Form.Control.Feedback>}
+                            </Col>
+                          </Row>
+                        </Form.Group>
+                      )}
+                    />
+                  )
+                default:
+                  return (
+                    <Controller
+                      key={key}
+                      name={key}
+                      control={control}
+                      render={({ field, fieldState: { invalid, error } }) => (
+                        <Form.Group controlId={key}>
+                          <Row className='mt-2'>
+                            <Col sm={12}>
+                              <div className='d-flex align-items-center'>
+                                <Form.Label className='w-sm mb-0'>{configData[key].display_name}</Form.Label>
+                                <div className={configData[key].classNames ?? 'fr-1'}>
+                                  <Form.Control
+                                    disabled={configData[key].readonly ?? false}
+                                    type={configData[key].type ?? 'text'}
+                                    isInvalid={invalid || !!serverErrors[key]}
+                                    {...field}
+                                  />
+                                  {invalid && <Form.Control.Feedback type="invalid">{error?.message}</Form.Control.Feedback>}
+                                  {!!serverErrors[key] && <Form.Control.Feedback type="invalid">{serverErrors[key]}</Form.Control.Feedback>}
+                                </div>
+                                {configData[key].post_display && (
+                                  <div className='ms-2'>{configData[key].post_display}</div>
+                                )}
                               </div>
-                              {configData[key].post_display && (
-                                <div className='ms-2'>{configData[key].post_display}</div>
-                              )}
-                            </div>
-                          </Col>
-                        </Row>
-                      </Form.Group>
-                    )}
-                  />
-                )
-              default:
-                return (
-                  <Controller
-                    key={key}
-                    name={key}
-                    control={control}
-                    render={({ field, fieldState: { invalid, error } }) => (
-                      <Form.Group controlId={key}>
-                        <Row className='mt-2'>
-                          <Col sm={12}>
-                            <div className='d-flex align-items-center'>
-                              <Form.Label className='w-sm mb-0'>{configData[key].display_name}</Form.Label>
-                              <div className={configData[key].classNames ?? 'fr-1'}>
-                                <Form.Control
-                                  disabled={configData[key].readonly ?? false}
-                                  type={configData[key].type ?? 'text'}
-                                  isInvalid={invalid || !!serverErrors[key]}
-                                  {...field}
-                                />
-                                {invalid && <Form.Control.Feedback type="invalid">{error?.message}</Form.Control.Feedback>}
-                                {!!serverErrors[key] && <Form.Control.Feedback type="invalid">{serverErrors[key]}</Form.Control.Feedback>}
-                              </div>
-                              {configData[key].post_display && (
-                                <div className='ms-2'>{configData[key].post_display}</div>
-                              )}
-                            </div>
-                          </Col>
-                        </Row>
-                      </Form.Group>
-                    )}
-                  />
-                )
+                            </Col>
+                          </Row>
+                        </Form.Group>
+                      )}
+                    />
+                  )
+              }
             }
-          }
-          )}
-          <div className="d-flex justify-content-end">
-            <Button type="submit" variant="primary">{isRetry ? 'Tạo lại' : 'Tạo'}</Button>
-            <Button variant="outline-secondary" onClick={handleCancel} className='ms-2'>Cancel</Button>
-          </div>
-        </Form>
-      </div>
-      {source !== 'auto' &&
-        <div className='fr-1 maw-750 ms-3'>
-          <Dashboard
-            uppy={uppy}
-            hideUploadButton={true}
-            plugins={["DragDrop"]}
-            width='100%'
-            {...props}
-          />
+            )}
+            <div className="d-flex justify-content-end">
+              <Button type="submit" variant="primary">{isRetry ? 'Tạo lại' : 'Tạo'}</Button>
+              <Button variant="outline-secondary" onClick={handleCancel} className='ms-2'>Cancel</Button>
+            </div>
+          </Form>
         </div>
-      }
-    </div>
+        {source !== 'auto' &&
+          <div className='fr-1 maw-750 ms-3'>
+            <Dashboard
+              uppy={uppy}
+              hideUploadButton={true}
+              plugins={["DragDrop"]}
+              width='100%'
+              {...props}
+            />
+          </div>
+        }
+      </div>
+    }
+    </>
   )
 }
 
@@ -562,6 +585,9 @@ export async function getServerSideProps() {
 			}
 		}
 	}
+  return {
+    props: {}
+  }
 }
 
 CreateJobPage.pageTitle = 'Tạo job'

@@ -154,6 +154,10 @@ export async function getServerSideProps() {
 			}
 		}
 	}
+	return {
+		props: {
+		}
+	}
 }
 
 RoleManager.pageTitle = 'Quản lý role'
