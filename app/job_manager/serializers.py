@@ -16,7 +16,6 @@ from rest_framework_tus import api
 
 logger = logging.getLogger(__name__)
 
-print(__name__)
 
 class JobManagerSerializer(serializers.ModelSerializer):
 
@@ -54,7 +53,7 @@ class JobSerializer(serializers.ModelSerializer):
         logger.warning("Create Job ......")
 
         validated_data['status'] = 'creating'
-        validated_data['source'] = 'manual'
+        # validated_data['source'] = 'manual'
         today = datetime.today()
         des_folder_path = f'/Working/{today.year}/{today.month}/{today.day}'
         validated_data['des_path'] = des_folder_path

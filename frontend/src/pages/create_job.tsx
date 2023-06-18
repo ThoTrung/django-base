@@ -2,10 +2,8 @@ import { Row, Col, ListGroup, Button, Modal, Form } from '@blueupcode/components
 import React, { useEffect } from 'react';
 import type { ExtendedNextPage } from '@blueupcode/components/types'
 import withAuth from 'components/auth/withAuth'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faTimes } from '@fortawesome/free-solid-svg-icons'
-import { apiUrl } from "constant/env";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useRouter } from 'next/router';
 import { AShowLoading, AHideLoading } from 'store/common/actions'
 import { useForm, Controller } from 'react-hook-form'
 import DateTimePicker from 'react-datetime'
@@ -33,11 +31,12 @@ import {
   ICUser,
   listCUsers
 } from 'store/request/user_manager'
-import { DATETIME_FORMAT, DATE_FORMAT, TIME_FORMAT, DATE_FORMAT_DISPLAY, NUMBER_ARRAY_10, ALLOW_FILE_TYPES } from 'constant/const';
-import { string } from 'prop-types'
+import { DATETIME_FORMAT, DATE_FORMAT, TIME_FORMAT, NUMBER_ARRAY_10, ALLOW_FILE_TYPES } from 'constant/const';
+import { getSCreateJob } from 'store/c2c/selectors';
 
 
 const uppy = new Uppy({
+  id: 'create_job_uppy',
   meta: { type: "avatar" },
   // restrictions: {
   //   allowedFileTypes: ['.jpg', '.png'],
@@ -158,16 +157,23 @@ const validationSchema = yup.object().shape(validateObject);
 const CreateJobPage: ExtendedNextPage<ICreateJobProps> = (props) => {
   const [serverErrors, setServerErrors] = React.useState<any>({});
   const [fileGUIDs, setFileGUIDs] = React.useState<string[]>([]);
-
+  const [isRetry, setIsRetry] = React.useState<boolean>(false);
+  // const [selectedCreateJob, setSelectedCreaetJob] = React.useState<string[]>([]);
+  
+  
+  const router = useRouter();
   const dispatch = useDispatch();
+  const source = router.query?.source ?? 'manual';
+  const selectedCreateJob = useSelector(getSCreateJob);
 
   React.useEffect(() => {
+    console.log('2222222222 clo')
     return () => uppy.close();
   }, []);
 
   const defaultValue = {};
   Object.keys(configData).forEach(key => {
-    defaultValue[key] = configData[key].default_value ?? '';
+    defaultValue[key] = (source === 'auto' && selectedCreateJob && selectedCreateJob[key]) ? selectedCreateJob[key] : (configData[key].default_value ?? '');
   });
 
 	const {control, handleSubmit, setValue, getValues, reset} = useForm<ICreateJob>({
@@ -215,33 +221,39 @@ const CreateJobPage: ExtendedNextPage<ICreateJobProps> = (props) => {
     Object.keys(configData).forEach(key => {
       payload[key] = formData[key];
     });
-    // if (!isUpdateMode || changePassword) {
-    // }
-    let fileGUIDsTemp = fileGUIDs;
-    const resFiles = await uppy.upload();
-    if (resFiles.failed.length === 0) {
-      resFiles.successful.forEach(item => {
-        const urlElements = item.uploadURL.split('/').filter(n => n);
-        fileGUIDsTemp.push(urlElements.pop());
-      })
+    payload['source'] = source;
 
-      payload['files'] = fileGUIDsTemp;
-      setFileGUIDs(fileGUIDsTemp);
-
-      console.log('payload ------', payload);
-
-      console.log ('resFiles ------', resFiles);
-      const res = await createJob(payload as ICreateJob);
-      console.log(res);
-
-      const swalTitle = 'Tạo Job thành công'
-      if (isSuccessRequest(res)) {
-        swalSuccess(swalTitle);
-      } else { // Error: 4xx
-        setServerErrors(res.data);
-      }
+    if (source === 'auto') {
+      payload['files'] = selectedCreateJob['files'] ?? [];
     } else {
-      // There are some file that are not successfull upload. Do something.
+      // Upload file and handle resume
+      const resFiles = await uppy.upload();
+      let fileGUIDsTemp = fileGUIDs;
+  
+      if (resFiles.successful.length > 0) {
+        resFiles.successful.forEach(item => {
+          console.log('---------111111111', item)
+          const urlElements = item.uploadURL.split('/').filter(n => n);
+          fileGUIDsTemp.push(urlElements.pop());
+        })
+        setFileGUIDs(fileGUIDsTemp);
+      }
+      
+      if (resFiles.failed.length === 0) {
+        payload['files'] = fileGUIDsTemp;
+        setIsRetry(false);
+      } else {
+        // Need to retry.
+        setIsRetry(true);
+      }
+    }
+
+    const res = await createJob(payload as ICreateJob);
+    const swalTitle = 'Tạo Job thành công'
+    if (isSuccessRequest(res)) {
+      swalSuccess(swalTitle);
+    } else { // Error: 4xx
+      setServerErrors(res.data);
     }
     dispatch(AHideLoading());
   }
@@ -314,21 +326,23 @@ const CreateJobPage: ExtendedNextPage<ICreateJobProps> = (props) => {
                                 {invalid && <Form.Control.Feedback type="invalid">{error?.message}</Form.Control.Feedback>}
                                 {!!serverErrors[key] && <Form.Control.Feedback type="invalid">{serverErrors[key]}</Form.Control.Feedback>}
                               </div>
-                              <div className='align-self-start'>
-                                <label htmlFor="forderInput" className='btn btn-success ms-2'>Duyệt thư mục</label>
-                                <input
-                                  type="file"
-                                  id="forderInput"
-                                  onChange={(e) => {
-                                    handleFolderSelection(e, key);
-                                  }}
-                                  accept={configData[key].allow_file_type ?? null}
-                                  hidden
-                                  webkitdirectory="true"
-                                  directory
-                                  multiple
-                                />
-                              </div>
+                              {source !== 'auto' && 
+                                <div className='align-self-start'>
+                                  <label htmlFor="forderInput" className='btn btn-success ms-2'>Duyệt thư mục</label>
+                                  <input
+                                    type="file"
+                                    id="forderInput"
+                                    onChange={(e) => {
+                                      handleFolderSelection(e, key);
+                                    }}
+                                    accept={configData[key].allow_file_type ?? null}
+                                    hidden
+                                    webkitdirectory="true"
+                                    directory
+                                    multiple
+                                  />
+                                </div>
+                              }
                             </div>
                           </Col>
                         </Row>
@@ -506,20 +520,22 @@ const CreateJobPage: ExtendedNextPage<ICreateJobProps> = (props) => {
           }
           )}
           <div className="d-flex justify-content-end">
-            <Button type="submit" variant="primary">Tạo</Button>
+            <Button type="submit" variant="primary">{isRetry ? 'Tạo lại' : 'Tạo'}</Button>
             <Button variant="outline-secondary" onClick={handleCancel} className='ms-2'>Cancel</Button>
           </div>
         </Form>
       </div>
-      <div className='fr-1 maw-750 ms-3'>
-        <Dashboard
-          uppy={uppy}
-          hideUploadButton={true}
-          plugins={["DragDrop"]}
-          width='100%'
-          {...props}
-        />
-      </div>
+      {source !== 'auto' &&
+        <div className='fr-1 maw-750 ms-3'>
+          <Dashboard
+            uppy={uppy}
+            hideUploadButton={true}
+            plugins={["DragDrop"]}
+            width='100%'
+            {...props}
+          />
+        </div>
+      }
     </div>
   )
 }

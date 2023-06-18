@@ -135,6 +135,7 @@ class ListSpecifyFolderFromDiskView(APIView):
                             'files': [],
                             'count': 0,
                             'lastModifiedFolder': lastModifiedTimeOfFolder,
+                            'orgPath': parentPath,
                             'path': pathlib.Path(parentPath).as_posix().replace(
                                 '/LocalDrive', 'E:\\MyDrive'
                             ).replace(
@@ -145,7 +146,7 @@ class ListSpecifyFolderFromDiskView(APIView):
                             # lastModifiedTimeOfFile = file.lstat().st_mtime
                             # if lastModifiedTimeOfFile >= startTime and lastModifiedTimeOfFile <= endTime and file.name not in ignoreFolders:
                             if file.name not in ignoreFolders:
-                                # tempRes['files'].append(str(file.resolve()))
+                                tempRes['files'].append(str(file.resolve()))
                                 tempRes['count'] += 1
                         if tempRes['count'] > 0:
                             res[parentPath] = tempRes

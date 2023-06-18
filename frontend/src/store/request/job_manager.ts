@@ -9,6 +9,7 @@ export interface IListFolderFromDisk {
 
 export interface IOneFolder {
   path: string;
+  orgPath: string;
   lastModifiedFolder: string;
   files: string[];
   count: number;

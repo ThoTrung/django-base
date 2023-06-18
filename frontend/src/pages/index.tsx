@@ -5,7 +5,8 @@ import withAuth from 'components/auth/withAuth'
 import { Row, Col, Portlet, Form, Button, InputGroup, Table, Spinner } from '@blueupcode/components'
 
 import type { ExtendedNextPage } from '@blueupcode/components/types'
-import Router from 'next/router'
+import { useDispatch, useSelector } from "react-redux";
+import Router, { useRouter } from 'next/router'
 import PAGE from 'config/page.config'
 import DateTimePicker from 'react-datetime'
 import { string } from 'prop-types'
@@ -22,6 +23,7 @@ import { DATETIME_FORMAT, DATE_FORMAT, TIME_FORMAT, DATE_FORMAT_DISPLAY } from '
 
 import SortableHeader, { IHandleSortParam, handleSortData } from 'components/table/sortable-header';
 import { isSuccessRequest } from 'store/request/helper';
+import { ASetCreateJobData } from 'store/c2c/actions';
 interface ISearchFolderSetting {
 	driver: string;
 	dropbox: string;
@@ -51,6 +53,8 @@ const DashboardPage: ExtendedNextPage = (props) => {
 	const [notificationStartTime, setNotificationStartTime] = React.useState<Moment.Moment>(Moment());
 	const [notificationData, setNotificationData] = React.useState<IOneFolder[]>([]);
 	
+	const router = useRouter();
+	const dispatch = useDispatch();
 
 	React.useEffect(() => {
 		getSearchFolderSetting()
@@ -94,8 +98,19 @@ const DashboardPage: ExtendedNextPage = (props) => {
     };
   }, [notificationStartTime]);	
 
-	const createJob = () => {
-		return Router.push('/create_job')
+	const createJob = (idx: number) => {
+		const payload = {
+			folder_path: data[idx].path,
+			file_number: data[idx].count,
+			files: data[idx].files,
+		}
+		dispatch(ASetCreateJobData(payload));
+		return Router.push({
+			pathname: '/create_job',
+			query: {
+				'source': 'auto'
+			}
+		})
 	}
 
 	const handleSortTableColumn = (param: IHandleSortParam) => {
@@ -293,7 +308,7 @@ const DashboardPage: ExtendedNextPage = (props) => {
 												<td>{item.count}</td>
 												<td className='miw-120'>Chưa tạo job</td>
 												<td>
-													<Button variant={'success'} onClick={createJob} className="ms-3 text-nowrap miw-80">
+													<Button variant={'success'} onClick={() => createJob(idx)} className="ms-3 text-nowrap miw-80">
 														Tạo Job
 													</Button>{' '}
 												</td>
