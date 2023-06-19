@@ -13,6 +13,7 @@ export interface IOneFolder {
   lastModifiedFolder: string;
   files: string[];
   count: number;
+  existedFileNumber: number;
 }
 
 export interface ISettingSearchFolder {

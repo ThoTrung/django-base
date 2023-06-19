@@ -1,4 +1,5 @@
 from datetime import datetime, timezone, time
+import shutil
 from drf_spectacular.utils import (
     extend_schema_view,
     extend_schema,
@@ -18,7 +19,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
 from ..models import (
-    JobManager, JobStatus, UserSettingJob
+    JobManager, JobStatus, UserSettingJob, Job,
 )
 from .. import serializers
 
@@ -134,6 +135,7 @@ class ListSpecifyFolderFromDiskView(APIView):
                         tempRes = {
                             'files': [],
                             'count': 0,
+                            'existedFileNumber': 0,
                             'lastModifiedFolder': lastModifiedTimeOfFolder,
                             'orgPath': parentPath,
                             'path': pathlib.Path(parentPath).as_posix().replace(
@@ -194,7 +196,23 @@ class ListSpecifyFolderFromDiskView(APIView):
 
         listFiles = driverListFiles + dropboxListFiles
 
-        return Response({'data': listFiles})
+        folderPaths = [file['path'] for file in listFiles]
+        existJobPaths = Job.objects.filter(folder_path__in=folderPaths).values('folder_path', 'file_number')
+        existJobPaths = {ejp['folder_path']:ejp['file_number'] for ejp in existJobPaths}
+
+        for file in listFiles:
+            if file['path'] in existJobPaths:
+                file['existedFileNumber'] = existJobPaths[file['path']]
+
+        #get disk usage 
+         
+        return Response({'data': 
+            {
+                'listFiles': listFiles,
+                'driver': shutil.disk_usage(DRIVER_FOLDER),
+                'dropbox': shutil.disk_usage(DROPBOX_FOLDER),
+            }
+        })
 
 class SearchFolderSettingView(APIView):
     # permission_classes = [IsAuthenticated]

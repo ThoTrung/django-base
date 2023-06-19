@@ -29,6 +29,12 @@ interface ISearchFolderSetting {
 	dropbox: string;
 }
 
+interface IDiskSpace {
+	total: number,
+	used: number,
+	free: number,
+}
+const HIGH_DISK_USED = 90;
 
 // interface aa {
 // 	lastModifiedFolder: string;
@@ -52,6 +58,8 @@ const DashboardPage: ExtendedNextPage = (props) => {
 	const [sortkey, setSortKey] = React.useState<string>('');
 	const [notificationStartTime, setNotificationStartTime] = React.useState<Moment.Moment>(Moment());
 	const [notificationData, setNotificationData] = React.useState<IOneFolder[]>([]);
+	const [driverUsePercent, setDriverUsePercent] = React.useState<number>(0);
+	const [dropboxUsedPercent, setDropboxUsedPercent] = React.useState<number>(0);
 	
 	const router = useRouter();
 	const dispatch = useDispatch();
@@ -83,9 +91,11 @@ const DashboardPage: ExtendedNextPage = (props) => {
 					endTime: '',
 				})
 				if (isSuccessRequest(res)) {
-					if (res.data.data?.length !== 0) {
-						setNotificationData(res.data.data);						
+					if (res.data.data?.listFiles?.length !== 0) {
+						setNotificationData(res.data.data.listFiles);
 					}
+					setDriverUsePercent(res.data.data.driver[1] * 100 / res.data.data.driver[0]);
+					setDropboxUsedPercent(res.data.data.dropbox[1] * 100 / res.data.data.dropbox[0]);
 				}
 			} catch (e) {
 				console.log(e);
@@ -139,9 +149,11 @@ const DashboardPage: ExtendedNextPage = (props) => {
 			if (isSuccessRequest(res)) {
 				setNotificationData([]);
 				setNotificationStartTime(Moment());
-				const sortedData = handleSortData({orgKey, sortType}, res.data.data);
+				const sortedData = handleSortData({orgKey, sortType}, res.data.data.listFiles);
 				setData(sortedData);
-				if (res.data.data?.length === 0) {
+				setDriverUsePercent(res.data.data.driver[1] * 100 / res.data.data.driver[0]);
+				setDropboxUsedPercent(res.data.data.dropbox[1] * 100 / res.data.data.dropbox[0]);
+				if (res.data.data?.listFiles?.length === 0) {
 					setErrorMsg('Không có data.');
 				}
 			}
@@ -167,8 +179,8 @@ const DashboardPage: ExtendedNextPage = (props) => {
 		<>
 			<Form.Group as={Row} controlId="colFormLabelLg">
 				<Col sm={12} className='d-flex flex-row'>
-					<Form.Label column className='miw-60'>
-						Dropbox:
+					<Form.Label column className={"miw-120 " + (dropboxUsedPercent >= HIGH_DISK_USED ? 'text-danger fw-bold' : '')}>
+						Dropbox: {dropboxUsedPercent.toFixed(2)} %
 					</Form.Label>
 					<Form.Label column className='ps-3 miw-90'>
 						E:\Dropbox\
@@ -186,8 +198,8 @@ const DashboardPage: ExtendedNextPage = (props) => {
 				</Col>
 
 				<Col sm={12} className='d-flex flex-row mt-3'>
-					<Form.Label column className='miw-60'>
-						Driver:
+					<Form.Label column className={"miw-120 " + (dropboxUsedPercent >= HIGH_DISK_USED ? 'text-danger fw-bold' : '')}>
+						Driver: {driverUsePercent.toFixed(2)}%
 					</Form.Label>
 					<Form.Label column className='ps-3 miw-90'>
 						E:\MyDrive\
@@ -306,7 +318,14 @@ const DashboardPage: ExtendedNextPage = (props) => {
 												<td>{Moment.unix(parseFloat(item.lastModifiedFolder)).format('YYYY-MM-DD HH:mm')}</td>
 												{/* <td>{item.files ? item.files.length : 0}</td> */}
 												<td>{item.count}</td>
-												<td className='miw-120'>Chưa tạo job</td>
+												<td className='miw-120'>
+													{
+														item.existedFileNumber > 0 ?
+														`Đã tạo Job và có ${item.existedFileNumber - item.count} files mới`
+														:
+														'Chưa tạo Job'
+													}
+												</td>
 												<td>
 													<Button variant={'success'} onClick={() => createJob(idx)} className="ms-3 text-nowrap miw-80">
 														Tạo Job

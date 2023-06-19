@@ -1,6 +1,8 @@
 import { swal } from 'components/sweetalert2/instance'
 import { isSuccessRequest } from 'store/request/helper';
 import { AxiosResponse } from 'axios';
+import { title } from 'process';
+import { result } from 'lodash';
 
 // Set SweetAlert options
 export const swalSuccess = (swalTitle:string) => {
@@ -25,6 +27,21 @@ export const swalDelete:any = ()  => {
     confirmButtonColor: '#3085d6',
     cancelButtonColor: '#d33',
     confirmButtonText: 'Xóa',
+  })
+  .then((result) => {
+    return result;
+  })
+}
+
+export const swalErrorRetry = (swalTitle: string) => {
+  return swal.fire({
+    title: `Bạn có muốn muốn ${swalTitle} lại không?`,
+    text: `Đã có lỗi xảy ra khi ${swalTitle}. Bạn có muốn ${swalTitle} lại không`,
+    icon: 'error',
+    showCancelButton: true,
+    confirmButtonColor: '#2196f3',
+    cancelButtonColor: '#d33',
+    confirmButtonText: `${swalTitle} lại`,
   })
   .then((result) => {
     return result;

@@ -87,6 +87,7 @@ class Job(BaseModel):
     name = models.CharField(max_length=520, db_index=True)
     customer = models.ForeignKey(CustomerManager, on_delete=models.CASCADE)
     files = ArrayField(models.CharField(max_length=520), blank=True, default=list)
+    file_number = models.PositiveIntegerField(default=0)
     expose = models.CharField(max_length=255, blank=False)
     style = models.TextField(blank=False)
     note = models.TextField(blank=True, null=True)

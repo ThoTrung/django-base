@@ -33,6 +33,7 @@ import {
 } from 'store/request/user_manager'
 import { DATETIME_FORMAT, DATE_FORMAT, TIME_FORMAT, NUMBER_ARRAY_10, ALLOW_FILE_TYPES } from 'constant/const';
 import { getSCreateJob } from 'store/c2c/selectors';
+import { swal } from 'components/sweetalert2/instance';
 
 const configData = {
 	folder_path: {
@@ -243,12 +244,16 @@ const CreateJobPage: ExtendedNextPage<ICreateJobProps> = (props) => {
         payload['files'] = selectedCreateJob['files'] ?? [];
       } else {
         // Upload file and handle resume
-        const resFiles = await uppy.upload();
+        let resFiles = null;
+        if (!isRetry) {
+          resFiles = await uppy.upload();
+        } else {
+          resFiles = await uppy.retryAll();
+        }
         let fileGUIDsTemp = fileGUIDs;
     
         if (resFiles.successful.length > 0) {
           resFiles.successful.forEach(item => {
-            console.log('---------111111111', item)
             const urlElements = item.uploadURL.split('/').filter(n => n);
             fileGUIDsTemp.push(urlElements.pop());
           })
@@ -261,6 +266,9 @@ const CreateJobPage: ExtendedNextPage<ICreateJobProps> = (props) => {
         } else {
           // Need to retry.
           setIsRetry(true);
+          dispatch(AHideLoading());
+          swal.fire('Upload files không thành công!', '', 'error');
+          return;
         }
       }
 
