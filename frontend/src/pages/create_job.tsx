@@ -367,7 +367,7 @@ const CreateJobPage: ExtendedNextPage<ICreateJobProps> = (props) => {
                                       accept={configData[key].allow_file_type ?? null}
                                       hidden
                                       webkitdirectory="true"
-                                      directory
+                                      // directory
                                       multiple
                                     />
                                   </div>
