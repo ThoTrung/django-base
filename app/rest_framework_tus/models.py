@@ -76,7 +76,7 @@ class AbstractUpload(models.Model):
 
     def get_or_create_temporary_file(self):
         if not self.temporary_file_path:
-            fd, path = tempfile.mkstemp(prefix="tus-upload-")
+            fd, path = tempfile.mkstemp(prefix="tus-upload-", dir='/var/tmp')
             os.close(fd)
             self.temporary_file_path = path
             self.save()
