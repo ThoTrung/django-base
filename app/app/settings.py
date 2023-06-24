@@ -229,7 +229,7 @@ LOGGING = {
     "handlers": {
         "file": {
             'class': 'logging.handlers.TimedRotatingFileHandler',
-            "filename": "debug.log",
+            "filename": "logs/debug.log",
             # "level": "DEBUG",
             "formatter": "verbose",
             'when': 'D', # this specifies the interval

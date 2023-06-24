@@ -16,7 +16,8 @@ import {
   IEmail,
   createEmails,
   updateEmails,
-  deleteEmails
+  deleteEmails,
+  IEmailSetting
 } from 'store/request/email_manager'
 import { DATETIME_FORMAT, DATE_FORMAT, TIME_FORMAT, DATE_FORMAT_DISPLAY } from 'constant/const';
 import { string } from 'prop-types'
@@ -26,6 +27,7 @@ type Props = {
   selectedEmail: IEmail | null;
   handleShow: (show:boolean) => void;
   refreshData: () => void;
+  emailSetting: IEmailSetting;
 }
 
 const validationSchema = yup.object().shape({
@@ -70,7 +72,7 @@ const EmailManagerModal = (props: Props) => {
         if (isSuccessRequest(res)) {
           props.refreshData();
           handleHide();
-          swalDeleteSuccess('Khách hàng');
+          swalDeleteSuccess('Email');
         }
         dispatch(AHideLoading());
       }
@@ -92,6 +94,7 @@ const EmailManagerModal = (props: Props) => {
     let res = null;
     let swalTitle = '';
     if (props.selectedEmail === null) {
+      payload['primary_email'] = `${payload['primary_email']}@${props.emailSetting.domain}`;
       res = await createEmails(payload);
       swalTitle = 'Thêm Email thành công.'
     } else {
@@ -149,22 +152,24 @@ const EmailManagerModal = (props: Props) => {
               control={control}
               render={({ field, fieldState: { invalid, error } }) => (
                 <Form.Group controlId="primary_email">
-                  <Row className='mt-2'>
+                  <Row className='mt-2 align-items-center'>
                     <Col sm={3}>
-                      <Form.Label>Email *:</Form.Label>
+                      <Form.Label className='mb-0'>Email *:</Form.Label>
                     </Col>
-                    <Col sm={5}>
+                    <Col sm={props.selectedEmail ? 9 : 5}>
                       <Form.Control
-                        disabled={readOnly}
+                        disabled={!!props.selectedEmail}
                         isInvalid={invalid || !!serverErrors['primary_email']}
                         {...field}
                       />
                       {invalid && <Form.Control.Feedback type="invalid">{error?.message}</Form.Control.Feedback>}
                       {!!serverErrors['primary_email'] && <Form.Control.Feedback type="invalid">{serverErrors['primary_email']}</Form.Control.Feedback>}
                     </Col>
-                    <Col sm={4}>
-                      <Form.Label>@domain.com</Form.Label>
-                    </Col>
+                    {!props.selectedEmail &&
+                      <Col sm={4}>
+                        <Form.Label className='mb-0'>@{props.emailSetting?.domain}</Form.Label>
+                      </Col>
+                    }
                   </Row>
                 </Form.Group>
               )}
@@ -175,9 +180,9 @@ const EmailManagerModal = (props: Props) => {
               control={control}
               render={({ field, fieldState: { invalid, error } }) => (
                 <Form.Group controlId="password">
-                  <Row className='mt-2'>
+                  <Row className='mt-2 align-items-center'>
                     <Col sm={3}>
-                      <Form.Label>Password *:</Form.Label>
+                      <Form.Label className='mb-0'>Password *:</Form.Label>
                     </Col>
                     <Col sm={5}>
                       <Form.Control
@@ -198,9 +203,9 @@ const EmailManagerModal = (props: Props) => {
               control={control}
               render={({ field, fieldState: { invalid, error } }) => (
                 <Form.Group controlId="first_name">
-                  <Row className='mt-2'>
+                  <Row className='mt-2 align-items-center'>
                     <Col sm={3}>
-                      <Form.Label>Họ *:</Form.Label>
+                      <Form.Label className='mb-0'>Họ *:</Form.Label>
                     </Col>
                     <Col sm={5}>
                       <Form.Control
@@ -221,9 +226,9 @@ const EmailManagerModal = (props: Props) => {
               control={control}
               render={({ field, fieldState: { invalid, error } }) => (
                 <Form.Group controlId="last_name">
-                  <Row className='mt-2'>
+                  <Row className='mt-2 align-items-center'>
                     <Col sm={3}>
-                      <Form.Label>Tên *:</Form.Label>
+                      <Form.Label className='mb-0'>Tên *:</Form.Label>
                     </Col>
                     <Col sm={5}>
                       <Form.Control
@@ -243,9 +248,9 @@ const EmailManagerModal = (props: Props) => {
               control={control}
               render={({ field, fieldState: { invalid, error } }) => (
                 <Form.Group controlId="phone_number">
-                  <Row className='mt-2'>
+                  <Row className='mt-2 align-items-center'>
                     <Col sm={3}>
-                      <Form.Label>Số điện thoại :</Form.Label>
+                      <Form.Label className='mb-0'>Số điện thoại :</Form.Label>
                     </Col>
                     <Col sm={5}>
                       <Form.Control

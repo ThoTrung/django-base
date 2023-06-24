@@ -176,6 +176,14 @@ const EmailManagerPage: ExtendedNextPage<IEmailProps> = (props) => {
 								handleSortTableColumn={handleSortTableColumn}
 							/>
 						</th>
+						<th scope="col" className=''>
+							<SortableHeader
+								title='Trạng thái'
+								orgKey='status'
+								sortKey={sortKey}
+								handleSortTableColumn={handleSortTableColumn}
+							/>
+						</th>
 						<th scope="col" className=''>Số điện thoại</th>
 					</tr>
 				</thead>
@@ -187,6 +195,7 @@ const EmailManagerPage: ExtendedNextPage<IEmailProps> = (props) => {
 									<td>{item.primary_email}</td>
 									<td>{item.first_name}</td>
 									<td>{item.last_name}</td>
+									<td>{item.status}</td>
 									<td>{item.phone_number}</td>
 								</tr>
 							))
@@ -200,6 +209,7 @@ const EmailManagerPage: ExtendedNextPage<IEmailProps> = (props) => {
 					handleShow={setShowModal}
 					selectedEmail={selectedEmail}
 					refreshData={refreshData}
+					emailSetting={emailSetting}
 				/>
 				}
 		</>

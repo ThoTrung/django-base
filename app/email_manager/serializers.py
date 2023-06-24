@@ -23,4 +23,22 @@ class EmailSerializer(serializers.ModelSerializer):
             'status',
             'cancel_date',
         ]
-        read_only_fields=['id']
+        read_only_fields=['id', 'status']
+    def validate(self, attrs):
+        request = self.context.get('request')
+        user = request.user
+        emailUserSetting = models.EmailUserSetting.objects.filter(owner=user).first()
+        if attrs['primary_email'].endswith(f"@{emailUserSetting.domain}") == False:
+            raise serializers.ValidationError({"primary_email": ["không đúng định dạng",]})
+        return attrs
+        # return super().validate(attrs)
+        
+    def create(self, validated_data):
+        return super().create(validated_data)
+    
+    def update(self, instance, validated_data):
+        del validated_data['primary_email']
+        for key, value in validated_data.items():
+            setattr(instance, key, value)
+        instance.save()
+        return instance

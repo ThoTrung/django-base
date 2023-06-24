@@ -17,7 +17,9 @@ class Email(coreModels.BaseModel):
     
     STATUS_CHOICES = (
         ('NEW', 'Tài khoản mới'),
+        ('PENDING', 'Tài khoản đang bị pending'),
         ('WORKING', 'Tài khoản đang dùng'),
+        ('CANCELING', 'Tài khoản đang bị xóa'),
         ('CANCELED', 'Tài khoản đã bị xóa'),
     )
 

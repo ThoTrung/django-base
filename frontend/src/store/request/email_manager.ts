@@ -6,7 +6,7 @@ export interface ICreateEmail {
   first_name: string,
   last_name: string,
   phone_number: string,
-  // status: string,
+  status?: string,
 }
 
 export interface IEmail extends ICreateEmail {
