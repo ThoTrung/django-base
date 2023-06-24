@@ -205,6 +205,8 @@ const CreateJobPage: ExtendedNextPage<ICreateJobProps> = (props) => {
           const customer = props.data.customers[id];
           setValue('expose', customer.expose);
           setValue('style', customer.style);
+          setValue('customer_price', customer.customer_price);
+          setValue('editor_price', customer.editor_price);
           setValue('deadline', customer.deadline ? customer.deadline.substring(0, 5) : '');
           console.log('customer.deadline', customer.deadline);
         }
@@ -298,15 +300,15 @@ const CreateJobPage: ExtendedNextPage<ICreateJobProps> = (props) => {
       // Filter file
       for (let i = 0; i < files.length; ++i) {
         const file = files[i];
-        if (ALLOW_FILE_TYPES.includes(file.type)) {
+        // if (ALLOW_FILE_TYPES.includes(file.type)) {
           acceptedFiles.push(file);
-          const generatedId = uppy.addFile({
+          uppy.addFile({
             source: 'Manual',
             name: file.name,
             type: file.type,
             data: file,
           });
-        }
+        // }
       }
       console.log('3333');
       setValue('folder_path', files[0].webkitRelativePath.split('/')[0]);
@@ -395,7 +397,7 @@ const CreateJobPage: ExtendedNextPage<ICreateJobProps> = (props) => {
                               <div className={configData[key].classNames ?? 'fr-1'}>
                                   <Form.Select
                                     disabled={configData[key].readonly ?? false}
-                                    defaultValue=""
+                                    // defaultValue=""
                                     {...field}
                                     onChange={(e) => {
                                       console.log('on change 111')

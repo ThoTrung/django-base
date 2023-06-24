@@ -53,15 +53,16 @@ class JobSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         # try:
         with transaction.atomic():
-            record_exists = Job.objects.filter(folder_path=validated_data['folder_path']).exists()
-            if record_exists:
-                raise serializers.ValidationError({
-                    'folder_path': f"Đã tồn tại Job với đường dẫn: {validated_data['folder_path']}",
-                })
+            if validated_data['source'] == 'auto':
+                record_exists = Job.objects.filter(folder_path=validated_data['folder_path']).exists()
+                if record_exists:
+                    raise serializers.ValidationError({
+                        'folder_path': f"Đã tồn tại Job với đường dẫn: {validated_data['folder_path']}",
+                    })
 
             validated_data['status'] = 'new'
-            today = datetime.today()
-            des_folder_path = f'/Working/{today.year}/{today.month}/{today.day}'
+            today = datetime.today().strftime("%Y-%m-%d").split('-')
+            des_folder_path = f'/Working/{today[0]}/{today[1]}/{today[2]}'
             validated_data['des_path'] = des_folder_path
 
             job = super().create(validated_data)
@@ -90,8 +91,6 @@ class JobSerializer(serializers.ModelSerializer):
                     'name': file.split('/')[-1]
                 } for file in validated_data['files']]
 
-            print('---------')
-            print(src_files)
             for src_file in src_files:
                 src_path = Path(src_file['path'])
                 for job_name in job_names:

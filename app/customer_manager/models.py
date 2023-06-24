@@ -21,6 +21,8 @@ class CustomerManager(BaseModel):
     state = models.CharField(max_length=255, blank=True, null=True)
     deadline = models.TimeField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
+    customer_price = models.FloatField(blank=True, null=True)
+    editor_price = models.FloatField(blank=True, null=True)
 
     def __str__(self):
         return self.name

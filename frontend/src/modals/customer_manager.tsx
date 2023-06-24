@@ -63,6 +63,8 @@ const CustomerManagerModal = (props: Props) => {
       state: (props.selectedCustomer ? props.selectedCustomer.state : ''),
       deadline: (props.selectedCustomer && props.selectedCustomer.deadline ? props.selectedCustomer.deadline.substring(0, 5) : ''),
       // description: (props.selectedCustomer ? props.selectedCustomer.description : ''),
+      customer_price: (props.selectedCustomer ? props.selectedCustomer.customer_price : 0),
+      editor_price: (props.selectedCustomer ? props.selectedCustomer.editor_price : 0),
 		},
   })
 
@@ -99,6 +101,8 @@ const CustomerManagerModal = (props: Props) => {
       contact_channel: formData.contact_channel,
       state: formData.state,
       deadline: deadline,
+      customer_price: formData.customer_price,
+      editor_price: formData.editor_price,
       // description: formData.description,
     }
     // if (!isUpdateMode || changePassword) {
@@ -336,9 +340,6 @@ const CustomerManagerModal = (props: Props) => {
                 </Form.Group>
               )}
             />
-
-
-
             <Controller
               name="state"
               control={control}
@@ -383,6 +384,58 @@ const CustomerManagerModal = (props: Props) => {
                       />
                       {invalid && <Form.Control.Feedback type="invalid">{error?.message}</Form.Control.Feedback>}
                       {!!serverErrors['deadline'] && <Form.Control.Feedback type="invalid">{serverErrors['deadline']}</Form.Control.Feedback>}
+                    </Col>
+                  </Row>
+                </Form.Group>
+              )}
+            />
+
+
+
+            <Controller
+              name="customer_price"
+              control={control}
+              render={({ field, fieldState: { invalid, error } }) => (
+                <Form.Group controlId="customer_price">
+                  <Row className='mt-2'>
+                    <Col sm={5}>
+                      <Form.Label>Giá KH:</Form.Label>
+                    </Col>
+                    <Col sm={7}>
+                      <Form.Control
+                        type='number'
+                        step="any"
+                        disabled={readOnly}
+                        isInvalid={invalid || !!serverErrors['customer_price']}
+                        {...field}
+                      />
+                      {invalid && <Form.Control.Feedback type="invalid">{error?.message}</Form.Control.Feedback>}
+                      {!!serverErrors['customer_price'] && <Form.Control.Feedback type="invalid">{serverErrors['customer_price']}</Form.Control.Feedback>}
+                    </Col>
+                  </Row>
+                </Form.Group>
+              )}
+            />
+
+            <Controller
+              name="editor_price"
+              control={control}
+              render={({ field, fieldState: { invalid, error } }) => (
+                <Form.Group controlId="editor_price">
+                  <Row className='mt-2'>
+                    <Col sm={5}>
+                      <Form.Label>Giá editor:</Form.Label>
+                    </Col>
+                    <Col sm={7}>
+                      <Form.Control
+                        type='number'
+                        step="any"
+                        disabled={readOnly}
+                        isInvalid={invalid || !!serverErrors['editor_price']}
+                        {...field}
+                      />
+                      {invalid && <Form.Control.Feedback type="invalid">{error?.message}</Form.Control.Feedback>}
+                      {!!serverErrors['editor_price'] && <Form.Control.Feedback type="invalid">{serverErrors['editor_price']}</Form.Control.Feedback>}
                     </Col>
                   </Row>
                 </Form.Group>

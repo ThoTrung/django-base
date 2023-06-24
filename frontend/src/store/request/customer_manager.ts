@@ -11,6 +11,8 @@ export interface ICreateCustomer {
   contact_channel: string,
   state: string,
   deadline: string,
+  customer_price: number,
+  editor_price: number,
   // description: string,
 }
 

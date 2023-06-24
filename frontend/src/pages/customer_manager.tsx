@@ -170,6 +170,8 @@ const CustomerManagerPage: ExtendedNextPage<ICustomerProps> = (props) => {
 						<th scope="col" className=''>Tên thanh toán</th>
 						<th scope="col" className=''>Số ĐT</th>
 						<th scope="col" className=''>Kênh liên lạc</th>
+						<th scope="col" className=''>Giá KH</th>
+						<th scope="col" className=''>Giá editor</th>
 					</tr>
 				</thead>
 					<tbody>
@@ -186,6 +188,8 @@ const CustomerManagerPage: ExtendedNextPage<ICustomerProps> = (props) => {
 									<td>{item.pay_name}</td>
 									<td>{item.phone_number}</td>
 									<td>{item.contact_channel}</td>
+									<td>{item.customer_price}</td>
+									<td>{item.editor_price}</td>
 								</tr>
 							))
 						) : (
