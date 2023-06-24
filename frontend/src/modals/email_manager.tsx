@@ -22,6 +22,53 @@ import {
 import { DATETIME_FORMAT, DATE_FORMAT, TIME_FORMAT, DATE_FORMAT_DISPLAY } from 'constant/const';
 import { string } from 'prop-types'
 
+
+
+const configData = {
+	primary_email: {
+		display_name: 'Email *:',
+    validate: yup.string().required('Bạn cần nhập email'),
+    default_value: '',
+    disable_on_edit: true,
+    extra_data: {
+      type: 'LABLE',
+      width: 4,
+      data: '',
+    }
+    // readonly: true,
+	},
+	password: {
+		display_name: 'Password *:',
+    validate: yup.string().required('Bạn cần nhập mật khẩu mặc định cho Email này'),
+    default_value: '',
+	},
+	first_name: {
+		display_name: 'Họ *:',
+    validate: yup.string().required('Bạn cần nhập Họ'),
+    default_value: '',
+	},
+	last_name: {
+		display_name: 'Tên *:',
+    validate: yup.string().required('Bạn cần nhập Tên'),
+    default_value: '',
+	},
+	phone_number: {
+		display_name: 'Tên *:',
+    default_value: '',
+	},
+}
+
+const validateObject:any  = {}
+
+Object.keys(configData).forEach(key => {
+  if (configData[key].validate) {
+    validateObject[key] = configData[key].validate;
+  }
+});
+
+const validationSchema = yup.object().shape(validateObject);
+
+
 type Props = {
   show: boolean;
   selectedEmail: IEmail | null;
@@ -30,16 +77,6 @@ type Props = {
   emailSetting: IEmailSetting;
 }
 
-const validationSchema = yup.object().shape({
-	primary_email: yup.string().required('Bạn cần nhập email'),
-	password: yup.string().required('Bạn cần password'),
-  first_name: yup.string().required('Bạn cần nhập họ'),
-  last_name: yup.string().required('Bạn cần nhập tên'),
-  // phone_number: yup.string().required('Bạn cần nhập style cố định'),
-  // pay_name: yup.string().required('Bạn cần nhập tên thanh toán'),
-  // phone_number
-  // contact_channel
-})
 
 const EmailManagerModal = (props: Props) => {
   const [readOnly, setReadOnly] = React.useState<boolean>(false);
@@ -51,16 +88,14 @@ const EmailManagerModal = (props: Props) => {
   const isUpdateMode = props.selectedEmail !== null;
   // const defaultPasswordNotUse = isUpdateMode ? 'defaultPasswordNotUse' : '';
 
-  const {control, handleSubmit} = useForm<ICreateEmail>({
+  const defaultValue = {};
+  Object.keys(configData).forEach(key => {
+    defaultValue[key] = (source === 'auto' && selectedCreateJob && selectedCreateJob[key]) ? selectedCreateJob[key] : (configData[key].default_value ?? '');
+  });
+
+	const {control, handleSubmit, setValue, getValues, reset} = useForm<ICreateJob>({
     resolver: yupResolver(validationSchema),
-		defaultValues: {
-      primary_email: (props.selectedEmail ? props.selectedEmail.primary_email : ''),
-			password: (props.selectedEmail ? props.selectedEmail.password : ''),
-      first_name: (props.selectedEmail ? props.selectedEmail.first_name : ''),
-      last_name: (props.selectedEmail ? props.selectedEmail.last_name : ''),
-      phone_number: (props.selectedEmail ? props.selectedEmail.phone_number : ''),
-      // description: (props.selectedEmail ? props.selectedEmail.description : ''),
-		},
+		defaultValues: defaultValue,
   })
 
   const handleDelete = async() => {
