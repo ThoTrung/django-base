@@ -74,7 +74,7 @@ type Props = {
   selectedEmail: IEmail | null;
   handleShow: (show:boolean) => void;
   refreshData: () => void;
-  emailSetting: IEmailSetting;
+  emailSetting: IEmailSetting | null;
 }
 
 
@@ -129,7 +129,7 @@ const EmailManagerModal = (props: Props) => {
     let res = null;
     let swalTitle = '';
     if (props.selectedEmail === null) {
-      payload['primary_email'] = `${payload['primary_email']}@${props.emailSetting.domain}`;
+      payload['primary_email'] = `${payload['primary_email']}@${props.emailSetting?.domain}`;
       res = await createEmails(payload);
       swalTitle = 'Thêm Email thành công.'
     } else {

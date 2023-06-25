@@ -4,7 +4,7 @@ import withAuth from 'components/auth/withAuth'
 import { Row, Col, Portlet, Form, Button, InputGroup, Table, Spinner } from '@blueupcode/components'
 import { useDispatch, useSelector } from "react-redux";
 import { AShowLoading, AHideLoading } from 'store/common/actions'
-
+import Badge from '@blueupcode/components';
 import type { ExtendedNextPage } from '@blueupcode/components/types'
 import { modalType, detailType, newType, updateType } from 'constant/type';
 import { isSuccessRequest } from 'store/request/helper'
@@ -195,7 +195,11 @@ const EmailManagerPage: ExtendedNextPage<IEmailProps> = (props) => {
 									<td>{item.primary_email}</td>
 									<td>{item.first_name}</td>
 									<td>{item.last_name}</td>
-									<td>{item.status}</td>
+									<td>
+										{/* <Badge variant='primary'> */}
+											{item.status}
+										{/* </Badge>{' '} */}
+									</td>
 									<td>{item.phone_number}</td>
 								</tr>
 							))
@@ -219,6 +223,7 @@ const EmailManagerPage: ExtendedNextPage<IEmailProps> = (props) => {
 
 export async function getServerSideProps() {
 	const	resEmail = await listEmails();
+	console.log(resEmail);
 	if (isSuccessRequest(resEmail)) {
 		const data = {
 			emails: resEmail.data,

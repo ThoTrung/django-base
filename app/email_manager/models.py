@@ -11,18 +11,33 @@ class EmailUserSetting(coreModels.BaseModel):
     def __str__(self):
         return self.domain
 
-    
+
+STATUSES = {
+    'NEW': {
+        'text': 'Tài khoản mới',
+        'variant': 'light',
+    },
+    'PENDING': {
+        'text': 'Tài khoản đang bị pending',
+        'variant': 'secondary',
+    },
+    'WORKING': {
+        'text': 'Tài khoản đang dùng',
+        'variant': 'success',
+    },
+    'CANCELING': {
+        'text': 'Tài khoản đang bị xóa',
+        'variant': 'warning',
+    },
+    'CANCELED': {
+        'text': 'Tài khoản đã bị xóa',
+        'variant': 'danger',
+    },
+}
+
+STATUS_CHOICES = [[key, STATUSES[key]['text']] for key in STATUSES]
 
 class Email(coreModels.BaseModel):
-    
-    STATUS_CHOICES = (
-        ('NEW', 'Tài khoản mới'),
-        ('PENDING', 'Tài khoản đang bị pending'),
-        ('WORKING', 'Tài khoản đang dùng'),
-        ('CANCELING', 'Tài khoản đang bị xóa'),
-        ('CANCELED', 'Tài khoản đã bị xóa'),
-    )
-
     primary_email = models.EmailField(unique=True)
     password = models.CharField(max_length=50)
     first_name = models.CharField(max_length=255)

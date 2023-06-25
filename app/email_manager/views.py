@@ -24,9 +24,8 @@ class EmailViewSet(viewsets.ModelViewSet):
         if email != '':
             queryset = queryset.filter(primary_email__icontains=email)
         return queryset
+
     
-    def delete():
-        pass
     
     def destroy(self, request, *args, **kwargs):
         email = self.get_object()
