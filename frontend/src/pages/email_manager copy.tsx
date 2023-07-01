@@ -10,79 +10,23 @@ import { isSuccessRequest } from 'store/request/helper'
 import SortableHeader, { IHandleSortParam, handleSortData } from 'components/table/sortable-header';
 import {
 	ICreateEmail,
+	IEmail,
 	IFilterEmail,
 	listEmails,
 	DEFAULT_FILTER_EMAIL,
 	IEmailSetting,
 	getEmailSetting,
 } from 'store/request/email_manager';
-import {
-	listCommon
-} from 'store/request/common';
 import { param } from 'react-dom-factories';
 import { useForm, Controller } from 'react-hook-form'
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
-import CommonModal from 'modals/common';
+import EmailManagerModal from 'modals/common';
 import { getSMyInfo } from 'store/myInfo/selectors';
-import PaginationNormal from 'components/common/pagination/pagination_normal';
-
-const PAGE_KEY = 'email_manager';
-
-const configData = {
-	filterConfig: {
-		defaultValue: {
-			email: '',
-		},
-		fields: {
-			primary_email: {
-				default: ''
-			}
-		}
-	},
-	fieldsInTable: ['primary_email', 'first_name', 'last_name', 'phone_number'],
-	fields: {
-		primary_email: {
-			display_name: 'Email',
-			require: true,
-			validate: yup.string().required('Bạn cần nhập email'),
-			default_value: '',
-			disable_on_edit: true,
-			extra_data: {
-				type: 'LABLE',
-				width: 4,
-				data: '',
-			}
-		},
-		password: {
-			display_name: 'Password',
-			require: true,
-			validate: yup.string().required('Bạn cần nhập mật khẩu mặc định cho Email này'),
-			default_value: '',
-		},
-		first_name: {
-			display_name: 'Họ',
-			require: true,
-			validate: yup.string().required('Bạn cần nhập Họ'),
-			default_value: '',
-		},
-		last_name: {
-			display_name: 'Tên',
-			require: true,
-			validate: yup.string().required('Bạn cần nhập Tên'),
-			default_value: '',
-		},
-		phone_number: {
-			display_name: 'SDT',
-			default_value: '',
-		},
-	}
-}
-
 
 export type IEmailProps = {
 	data: {
-		items: any[],
+		emails: IEmail[],
 	}
 };
 
@@ -101,20 +45,59 @@ export type TAdditionalData = {
 	statuses: TStatuses
 }
 
-const EmailManagerPage: ExtendedNextPage<any> = (props) => {
+export type TPagingData = {
+	total_pages: number;
+	cur_page: number;
+}
+
+const handleChangePage = (pageNumber: number) => {
+	console.log('--------', pageNumber)
+}
+
+const PaginationNormal = (props: any) => {
+	const {pagingData, ...res} = props;
+	const haftNumberOfDisplay = 3;
+	let start = pagingData.cur_page - haftNumberOfDisplay;
+	let end = pagingData.cur_page + haftNumberOfDisplay;
+	if (start < 0) {
+		const delta = 1 - start;
+		start += delta;
+		end += delta;
+	}
+	end = end <= pagingData.total_pages ? end : pagingData.total_pages;
+	const paginationNumber = []
+	while(start <= end){
+		paginationNumber.push(start++);
+	}
+	return (
+		<Pagination {...res}>
+			<Pagination.Item> {'<'} </Pagination.Item>
+			{paginationNumber.map((pageNumber: number) => (
+				<Pagination.Item
+					key={pageNumber}
+					active={pageNumber === pagingData.cur_page}
+					onClick={() => handleChangePage(pageNumber)}
+				>
+					{pageNumber}
+				</Pagination.Item>
+			))}
+			<Pagination.Item> {'>'} </Pagination.Item>
+		</Pagination>
+	)
+}
+
+
+const EmailManagerPage: ExtendedNextPage<IEmailProps> = (props) => {
 	const [showModal, setShowModal] = React.useState<boolean>(false);
 	const [errorMsg, setErrorMsg] = React.useState<string>('');
-	const [items, setItems] = React.useState<any[]>(props.data.items);
-	const [selectedItem, setSelectedItem] = React.useState<any | null>(null)
+	const [emails, setEmails] = React.useState<IEmail[]>(props.data.emails);
+	const [selectedEmail, setSelectedEmail] = React.useState<IEmail | null>(null)
 	const [sortKey, setSortKey] = React.useState<string>('');
 	const [sortType, setSortType] = React.useState<string>('');
 	const [emailSetting, setEmailSetting] = React.useState<IEmailSetting | null>(null);
 	const [additionalData, setAdditionalData] = React.useState<TAdditionalData | null>(null)
 	const [totalPages, setTotalPages] = React.useState<number>(0)
-	const [curPage, setCurPage] = React.useState<number>(0)
-	const [filterData, setFilterData] = React.useState<any>(configData.filterConfig.defaultValue);
 
-	
 	const filterSubmitBtnRef = React.useRef<HTMLButtonElement>(null);
 	const myInfo = useSelector(getSMyInfo);
 
@@ -131,10 +114,6 @@ const EmailManagerPage: ExtendedNextPage<any> = (props) => {
 
 	}, [myInfo])
 
-	React.useEffect(() => {
-		filter(filterData);
-	}, [])
-
 	const dispatch = useDispatch();
 
   const {control, handleSubmit} = useForm<IFilterEmail>({
@@ -148,11 +127,15 @@ const EmailManagerPage: ExtendedNextPage<any> = (props) => {
 		}
 	}
 
-	const filter = async(params: any, page: number = 1) => {
-		dispatch(AShowLoading());
+	const onSubmit = async (formData: IFilterEmail) => {
+    dispatch(AShowLoading());
+
+		const params={
+			email: formData.email,
+		}
 		const res = await listEmails(params);
 		if (isSuccessRequest(res)) {
-			setItems(res.data.results);
+			setEmails(res.data.results);
 			if (res.data.additional_data) {
 				setAdditionalData(res.data.additional_data)
 			}
@@ -160,34 +143,17 @@ const EmailManagerPage: ExtendedNextPage<any> = (props) => {
 				setTotalPages(res.data.total_pages);
 			}
 		}
-		setCurPage(page);
 
     dispatch(AHideLoading());
 	}
 
-	const onSubmit = async (formData: any) => {
-		const params={
-			email: formData.email,
-		}
-		setFilterData(params);
-		filter(params);
-	}
-
-	const handleChangePage = async (pageNumber: number) => {
-		const params = {
-			...filterData,
-			page: pageNumber,
-		}
-		filter(params, pageNumber);
-	}
-
 	const createNew = async () => {
-		setSelectedItem(null);
+		setSelectedEmail(null);
 		setShowModal(true);
 	}
 
 	const viewDetail = (idx: number) => {
-		setSelectedItem(items[idx]);
+		setSelectedEmail(emails[idx]);
 		setShowModal(true);
 	}
 
@@ -195,9 +161,9 @@ const EmailManagerPage: ExtendedNextPage<any> = (props) => {
 		dispatch(AShowLoading());
 		setSortKey(param.orgKey);
 		setSortType(param.sortType);
-		if (items) {
-			const sortedEmails = handleSortData(param, items);
-			setItems(sortedEmails);
+		if (emails) {
+			const sortedEmails = handleSortData(param, emails);
+			setEmails(sortedEmails);
 		}
 		dispatch(AHideLoading());
 	}
@@ -281,8 +247,8 @@ const EmailManagerPage: ExtendedNextPage<any> = (props) => {
 					</tr>
 				</thead>
 					<tbody>
-					{items && items?.length > 0 ? (
-							items.map((item, idx) => (
+					{emails && emails?.length > 0 ? (
+							emails.map((item, idx) => (
 								<tr key={idx + 1} className="cursor-pointer" onDoubleClick={() => viewDetail(idx)}>
 									<th scope="row">{idx + 1}</th>
 									<td>{item.primary_email}</td>
@@ -310,19 +276,18 @@ const EmailManagerPage: ExtendedNextPage<any> = (props) => {
 			</Table>
 			
 			<PaginationNormal
-					totalPages={totalPages}
-					curPage={curPage}
-					handleChangePage={handleChangePage}
+				pagingData = {{
+					'total_pages': totalPages,
+					'cur_page': 1
+				}}
 			/>
 
-			{showModal && <CommonModal
+			{showModal && <EmailManagerModal
 					show={showModal}
 					handleShow={setShowModal}
-					selectedItem={selectedItem}
+					selectedEmail={selectedEmail}
 					refreshData={refreshData}
 					emailSetting={emailSetting}
-					fields={configData.fields}
-					title="Email"
 				/>
 				}
 		</>
@@ -334,7 +299,7 @@ export async function getServerSideProps() {
 	const	resEmail = await listEmails();
 	if (isSuccessRequest(resEmail)) {
 		const data = {
-			items: resEmail.data,
+			emails: resEmail.data,
 		}
 		return {
 			props: {

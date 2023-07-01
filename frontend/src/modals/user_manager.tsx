@@ -107,7 +107,6 @@ const UserManagerModal = (props: Props) => {
 
   const onSubmit = async (formData: IRegisterCUser) => {
     dispatch(AShowLoading());
-    console.log('formData', formData);
     const payload={
       name: formData.name,
       email: formData.email,

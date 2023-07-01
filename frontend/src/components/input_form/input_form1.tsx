@@ -11,8 +11,8 @@ import { DATETIME_FORMAT, DATE_FORMAT, TIME_FORMAT, NUMBER_ARRAY_10, ALLOW_FILE_
 type Props = {
   configData: any,
   control: any,
-  handleFolderSelection: (event: React.ChangeEvent<HTMLInputElement>, key: string) => void,
-  onChangeSelect: (id: string, key: string) => void,
+  handleFolderSelection?: (event: React.ChangeEvent<HTMLInputElement>, key: string) => void,
+  onChangeSelect?: (id: string, key: string) => void,
   data: any,
 } 
 
@@ -42,7 +42,7 @@ export const InputForm1 = (props: Props) => {
                     <Row className='mt-2'>
                       <Col sm={12}>
                         <div className='d-flex align-items-center'>
-                          <Form.Label className='w-sm mb-0'>{config.display_name}</Form.Label>
+                          <Form.Label className='w-sm mb-0'>{`${config.display_name} ${config.require===true?'*':''}:`}</Form.Label>
                           <div className={config.classNames ?? 'fr-1'}>
                             <Form.Control
                               disabled={config.readonly ?? false}
@@ -61,7 +61,9 @@ export const InputForm1 = (props: Props) => {
                                 type="file"
                                 id="forderInput"
                                 onChange={(e) => {
-                                  handleFolderSelection(e, key);
+                                  if (handleFolderSelection) {
+                                    handleFolderSelection(e, key);
+                                  }
                                 }}
                                 accept={config.allow_file_type ?? null}
                                 hidden
@@ -90,16 +92,17 @@ export const InputForm1 = (props: Props) => {
                     <Row className='mt-2'>
                       <Col sm={12}>
                         <div className='d-flex align-items-center'>
-                        <Form.Label className='w-sm mb-0'>{config.display_name}</Form.Label>
+                        <Form.Label className='w-sm mb-0'>{`${config.display_name} ${config.require===true?'*':''}:`}</Form.Label>
                         <div className={config.classNames ?? 'fr-1'}>
                             <Form.Select
                               disabled={config.readonly ?? false}
                               // defaultValue=""
                               {...field}
                               onChange={(e) => {
-                                console.log('on change 111')
                                 field.onChange(e);
-                                onChangeSelect(e.target.value, key);
+                                if (onChangeSelect) {
+                                  onChangeSelect(e.target.value, key);
+                                }
                               }}
                             >
                               <option value=""></option>
@@ -128,7 +131,7 @@ export const InputForm1 = (props: Props) => {
                     <Row className='mt-2'>
                       <Col sm={12}>
                         <div className='d-flex align-items-center'>
-                          <Form.Label className='w-sm mb-0'>{config.display_name}</Form.Label>
+                          <Form.Label className='w-sm mb-0'>{`${config.display_name} ${config.require===true?'*':''}:`}</Form.Label>
                           <div className={config.classNames ?? 'fr-1'}>
                             <Form.Control
                               disabled={config.readonly ?? false}
@@ -158,7 +161,7 @@ export const InputForm1 = (props: Props) => {
                     <Row className='mt-2'>
                       <Col sm={12}>
                         <div className='d-flex align-items-center'>
-                          <Form.Label className='w-sm mb-0'>{config.display_name}</Form.Label>
+                          <Form.Label className='w-sm mb-0'>{`${config.display_name} ${config.require===true?'*':''}:`}</Form.Label>
                           <div className={config.classNames ?? 'fr-1'}>
                           <DateTimePicker
                             closeOnSelect
@@ -189,7 +192,7 @@ export const InputForm1 = (props: Props) => {
                     <Row className='mt-2'>
                       <Col sm={12}>
                         <div className='d-flex align-items-center'>
-                          <Form.Label className='w-sm mb-0'>{config.display_name}</Form.Label>
+                          <Form.Label className='w-sm mb-0'>{`${config.display_name} ${config.require===true?'*':''}:`}</Form.Label>
                           <div className={config.classNames ?? 'fr-1'}>
                             <Form.Control
                               disabled={config.readonly ?? false}
@@ -223,7 +226,7 @@ export const InputForm1 = (props: Props) => {
                     <Row className='mt-2'>
                       <Col sm={12}>
                         <div className='d-flex align-items-center'>
-                          <Form.Label className='w-sm mb-0'>{config.display_name}</Form.Label>
+                          <Form.Label className='w-sm mb-0'>{`${config.display_name} ${config.require===true?'*':''}:`}</Form.Label>
                           <div className={config.classNames ?? 'fr-1'}>
                             <Form.Control
                               disabled={config.readonly ?? false}

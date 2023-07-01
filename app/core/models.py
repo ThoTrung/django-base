@@ -4,6 +4,8 @@ Database models.
 import uuid
 import os
 
+import collections
+from jsonfield import JSONField
 from datetime import datetime
 from django.utils import timezone
 from django.conf import settings
@@ -86,6 +88,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     USERNAME_FIELD = 'name'
+
+
+class CommonUserSetting(BaseModel):
+    owner = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+    pagination = JSONField(load_kwargs={'object_pairs_hook': collections.OrderedDict})
+
 
 class Recipe(BaseModel):
     """Recipe object."""

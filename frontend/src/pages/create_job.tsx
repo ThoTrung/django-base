@@ -191,7 +191,6 @@ const CreateJobPage: ExtendedNextPage<ICreateJobProps> = (props) => {
   })
 
   const onChangeSelect = (id: string, key: string) => {
-    console.log('onChangeSelect', id, key);
     switch(key) {
       case 'customer':
         if (id) {
@@ -201,13 +200,11 @@ const CreateJobPage: ExtendedNextPage<ICreateJobProps> = (props) => {
           setValue('customer_price', customer.customer_price);
           setValue('editor_price', customer.editor_price);
           setValue('deadline', customer.deadline ? customer.deadline.substring(0, 5) : '');
-          console.log('customer.deadline', customer.deadline);
         }
         break;
       case 'number_sub_job':
         if (id && id > 0) {
           let jobName = getValues('name');
-          console.log('jobName', jobName);
           if (jobName) {
             jobName = jobName.split("__")[0];
             let jobNames = id > 1 ? `${jobName}__1` : jobName;
@@ -303,16 +300,13 @@ const CreateJobPage: ExtendedNextPage<ICreateJobProps> = (props) => {
           });
         // }
       }
-      console.log('3333');
       setValue('folder_path', files[0].webkitRelativePath.split('/')[0]);
     }
     if (acceptedFiles.length > 0) {
-      console.log('4444');
       setValue('file_number', acceptedFiles.length);
       delete serverErrors['folder_path'];
       setServerErrors({...serverErrors});
     } else {
-      console.log('555');
       setValue('file_number', 0);
       setServerErrors({...serverErrors, folder_path: 'Thư mục không có file thỏa mãn, hãy chắc chắn rằng thư mục bạn đang chọn có các file .jpg, .png'})
     }

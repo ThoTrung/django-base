@@ -11,7 +11,6 @@ const authVerifyCookie = async (ctx: NextPageContext) => {
 	
 	// Get absolute origin url
 	const { origin } = absoluteUrl(ctx.req)
-	console.log('33333333');
 
 	// Try to verify user token via API
 	// return await fetch(origin + '/api/auth', {

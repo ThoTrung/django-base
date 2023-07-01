@@ -15,7 +15,6 @@ import { AMyInfoRequest } from 'store/myInfo/actions'
 
 const withAuth = (PageComponent: ExtendedNextPage) => {
 
-	console.log('PageComponent.activeLink', PageComponent.activeLink)
 
 	// Initialize wrapper component
 	const WrapperComponent: ExtendedNextPage = (props) => {

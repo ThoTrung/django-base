@@ -11,6 +11,7 @@ import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { isSuccessRequest } from 'store/request/helper'
 import { swalSuccess, swalDelete, swalDeleteSuccess } from 'components/swals/swals'
+import { InputForm1 } from 'components/input_form/input_form1'
 import {
   ICreateEmail,
   IEmail,
@@ -20,90 +21,54 @@ import {
   IEmailSetting
 } from 'store/request/email_manager'
 import { DATETIME_FORMAT, DATE_FORMAT, TIME_FORMAT, DATE_FORMAT_DISPLAY } from 'constant/const';
-import { string } from 'prop-types'
-
-
-
-const configData = {
-	primary_email: {
-		display_name: 'Email *:',
-    validate: yup.string().required('Bạn cần nhập email'),
-    default_value: '',
-    disable_on_edit: true,
-    extra_data: {
-      type: 'LABLE',
-      width: 4,
-      data: '',
-    }
-    // readonly: true,
-	},
-	password: {
-		display_name: 'Password *:',
-    validate: yup.string().required('Bạn cần nhập mật khẩu mặc định cho Email này'),
-    default_value: '',
-	},
-	first_name: {
-		display_name: 'Họ *:',
-    validate: yup.string().required('Bạn cần nhập Họ'),
-    default_value: '',
-	},
-	last_name: {
-		display_name: 'Tên *:',
-    validate: yup.string().required('Bạn cần nhập Tên'),
-    default_value: '',
-	},
-	phone_number: {
-		display_name: 'Tên *:',
-    default_value: '',
-	},
-}
-
-const validateObject:any  = {}
-
-Object.keys(configData).forEach(key => {
-  if (configData[key].validate) {
-    validateObject[key] = configData[key].validate;
-  }
-});
-
-const validationSchema = yup.object().shape(validateObject);
-
 
 type Props = {
   show: boolean;
-  selectedEmail: IEmail | null;
+  selectedItem: any | null;
   handleShow: (show:boolean) => void;
   refreshData: () => void;
   emailSetting: IEmailSetting | null;
+  fields: any;
+  title: string;
 }
 
 
-const EmailManagerModal = (props: Props) => {
+const CommonModal = (props: Props) => {
   const [readOnly, setReadOnly] = React.useState<boolean>(false);
   const [show, setShow] = React.useState<boolean>(props.show);
   const [formTitle, setFormTitle] = React.useState<string>('');
   const [serverErrors, setServerErrors] = React.useState<any>({});
   
   const dispatch = useDispatch();
-  const isUpdateMode = props.selectedEmail !== null;
+  const isUpdateMode = props.selectedItem !== null;
   // const defaultPasswordNotUse = isUpdateMode ? 'defaultPasswordNotUse' : '';
 
-  const defaultValue = {};
-  Object.keys(configData).forEach(key => {
-    defaultValue[key] = (source === 'auto' && selectedCreateJob && selectedCreateJob[key]) ? selectedCreateJob[key] : (configData[key].default_value ?? '');
+  const validateObject:any  = {}
+
+  Object.keys(props.fields).forEach(key => {
+    if (props.fields[key].validate) {
+      validateObject[key] = props.fields[key].validate;
+    }
   });
 
-	const {control, handleSubmit, setValue, getValues, reset} = useForm<ICreateJob>({
+  const validationSchema = yup.object().shape(validateObject);
+
+  const defaultValue: any = {};
+  Object.keys(props.fields).forEach(key => {
+    defaultValue[key] = (props.selectedItem && props.selectedItem[key]) ? props.selectedItem[key] : props.fields[key].default_value;
+  });
+
+	const {control, handleSubmit, setValue, getValues, reset} = useForm<any>({
     resolver: yupResolver(validationSchema),
 		defaultValues: defaultValue,
   })
 
   const handleDelete = async() => {
-    if (props.selectedEmail !== null) {
+    if (props.selectedItem !== null) {
       const result = await swalDelete();
       if (result.isConfirmed) {
         dispatch(AShowLoading());
-        const res = await deleteEmails(props.selectedEmail.id)
+        const res = await deleteEmails(props.selectedItem.id)
         if (isSuccessRequest(res)) {
           props.refreshData();
           handleHide();
@@ -128,12 +93,12 @@ const EmailManagerModal = (props: Props) => {
     // }
     let res = null;
     let swalTitle = '';
-    if (props.selectedEmail === null) {
+    if (props.selectedItem === null) {
       payload['primary_email'] = `${payload['primary_email']}@${props.emailSetting?.domain}`;
       res = await createEmails(payload);
       swalTitle = 'Thêm Email thành công.'
     } else {
-      res = await updateEmails(props.selectedEmail.id, payload);
+      res = await updateEmails(props.selectedItem.id, payload);
       swalTitle = 'Cập nhật Email thành công.'
     }
     if (isSuccessRequest(res)) {
@@ -155,13 +120,13 @@ const EmailManagerModal = (props: Props) => {
 
   React.useEffect(() => {
     let readOnlyTemp = false;
-    let formTitleTemp = "Thêm Email"
-    if (props.selectedEmail !== null) {
-      formTitleTemp = "Cập nhật Email"
+    let formTitleTemp = `Thêm ${props.title}`
+    if (props.selectedItem !== null) {
+      formTitleTemp = `Cập nhật ${props.title}`
     }
     setReadOnly(readOnlyTemp);
     setFormTitle(formTitleTemp);
-  }, [props.selectedEmail])
+  }, [props.selectedItem, props.title])
 
 	return (
 		<>
@@ -181,6 +146,11 @@ const EmailManagerModal = (props: Props) => {
             </Button>
           </Modal.Header>
           <Modal.Body>
+            {/* <InputForm1
+              configData={props.fields}
+              control={control}
+              data={props.selectedItem}
+            /> */}
 
             <Controller
               name="primary_email"
@@ -191,16 +161,16 @@ const EmailManagerModal = (props: Props) => {
                     <Col sm={3}>
                       <Form.Label className='mb-0'>Email *:</Form.Label>
                     </Col>
-                    <Col sm={props.selectedEmail ? 9 : 5}>
+                    <Col sm={props.selectedItem ? 9 : 5}>
                       <Form.Control
-                        disabled={!!props.selectedEmail}
+                        disabled={!!props.selectedItem}
                         isInvalid={invalid || !!serverErrors['primary_email']}
                         {...field}
                       />
                       {invalid && <Form.Control.Feedback type="invalid">{error?.message}</Form.Control.Feedback>}
                       {!!serverErrors['primary_email'] && <Form.Control.Feedback type="invalid">{serverErrors['primary_email']}</Form.Control.Feedback>}
                     </Col>
-                    {!props.selectedEmail &&
+                    {!props.selectedItem &&
                       <Col sm={4}>
                         <Form.Label className='mb-0'>@{props.emailSetting?.domain}</Form.Label>
                       </Col>
@@ -302,9 +272,9 @@ const EmailManagerModal = (props: Props) => {
             />
           </Modal.Body>
           <Modal.Footer>
-            <Button type="submit" variant="primary">{props.selectedEmail ? 'Cập nhật' : 'Tạo mới'}</Button>
+            <Button type="submit" variant="primary">{props.selectedItem ? 'Cập nhật' : 'Tạo mới'}</Button>
             <Button variant="outline-secondary" onClick={handleHide}>Cancel</Button>
-            {props.selectedEmail && <Button variant="outline-danger" onClick={handleDelete}>Xóa</Button>}
+            {props.selectedItem && <Button variant="outline-danger" onClick={handleDelete}>Xóa</Button>}
           </Modal.Footer>
         </Form>
       </Modal>
@@ -313,4 +283,4 @@ const EmailManagerModal = (props: Props) => {
 	)
 }
 
-export default EmailManagerModal;
+export default CommonModal;

@@ -21,7 +21,19 @@
   &:empty {
     display: none;
   }
+
+  &.badge-md {
+    font-size: $font-size-base;
+  }
+  &.badge-lg {
+    font-size: $font-size-lg;
+  }
+  &.badge-xl {
+    font-size: $font-size-xl;
+  }
 }
+
+
 
 // Quick fix for badges in buttons
 .btn .badge {

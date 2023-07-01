@@ -53,10 +53,8 @@ const UserManagerFilter = (props: IUserManageFilterProps) => {
 			status: formData.status,
 			full_name: formData.full_name,
 		}
-		console.log(params)
 		const res = await listCUsers(params);
 		if (isSuccessRequest(res)) {
-			console.log('11------------', res);
 			props.setCUsers(res.data);
 		}
 
