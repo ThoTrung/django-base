@@ -180,7 +180,7 @@ const DashboardPage: ExtendedNextPage = (props) => {
 			<Form.Group as={Row} controlId="colFormLabelLg">
 				<Col sm={12} className='d-flex flex-row'>
 					<Form.Label column className={"miw-120 " + (dropboxUsedPercent >= HIGH_DISK_USED ? 'text-danger fw-bold' : '')}>
-						Dropbox: {dropboxUsedPercent.toFixed(2)} %
+						Dropbox: {dropboxUsedPercent.toFixed(2)}%
 					</Form.Label>
 					<Form.Label column className='ps-3 miw-90'>
 						E:\Dropbox\

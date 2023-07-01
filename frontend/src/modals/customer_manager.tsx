@@ -61,7 +61,7 @@ const CustomerManagerModal = (props: Props) => {
       phone_number: (props.selectedCustomer ? props.selectedCustomer.phone_number : ''),
       contact_channel: (props.selectedCustomer ? props.selectedCustomer.contact_channel : ''),
       state: (props.selectedCustomer ? props.selectedCustomer.state : ''),
-      deadline: (props.selectedCustomer && props.selectedCustomer.deadline ? props.selectedCustomer.deadline.substring(0, 5) : ''),
+      deadline: (props.selectedCustomer && props.selectedCustomer.deadline ? props.selectedCustomer.deadline.substring(0, 5) : '00:00'),
       // description: (props.selectedCustomer ? props.selectedCustomer.description : ''),
       customer_price: (props.selectedCustomer ? props.selectedCustomer.customer_price : 0),
       editor_price: (props.selectedCustomer ? props.selectedCustomer.editor_price : 0),
@@ -389,9 +389,6 @@ const CustomerManagerModal = (props: Props) => {
                 </Form.Group>
               )}
             />
-
-
-
             <Controller
               name="customer_price"
               control={control}
@@ -407,6 +404,7 @@ const CustomerManagerModal = (props: Props) => {
                         step="any"
                         disabled={readOnly}
                         isInvalid={invalid || !!serverErrors['customer_price']}
+                        min={0}
                         {...field}
                       />
                       {invalid && <Form.Control.Feedback type="invalid">{error?.message}</Form.Control.Feedback>}
@@ -432,6 +430,7 @@ const CustomerManagerModal = (props: Props) => {
                         step="any"
                         disabled={readOnly}
                         isInvalid={invalid || !!serverErrors['editor_price']}
+                        min={0}
                         {...field}
                       />
                       {invalid && <Form.Control.Feedback type="invalid">{error?.message}</Form.Control.Feedback>}

@@ -188,8 +188,8 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_TIMEOUT': 300,
-    'DEFAULT_PAGINATION_CLASS': 'core.custom_pagination.CustomPagination',
-    'PAGE_SIZE': 2,
+    # 'DEFAULT_PAGINATION_CLASS': 'core.custom_pagination.CustomPagination',
+    # 'PAGE_SIZE': 2,
 }
 
 SPECTACULAR_SETTINGS = {

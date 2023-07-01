@@ -107,6 +107,7 @@ const configData = {
     default_value: 0,
     classNames: 'w-md',
     post_display: 'USD',
+    min: 0,
 	},
 	editor_price: {
     type: 'number',
@@ -114,6 +115,7 @@ const configData = {
     default_value: 0,
     classNames: 'w-md',
     post_display: 'VNĐ',
+    min: 0,
 	},
 }
 
