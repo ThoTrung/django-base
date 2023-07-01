@@ -40,24 +40,24 @@ urlpatterns = [
     # path('upload/', TusUpload.as_view(), name='tus_upload'),
     # path('upload/<uuid:resource_id>', TusUpload.as_view(), name='tus_upload_chunks'),
 
-    path('api/health-check/', core_views.health_check, name='health-check'),
+    # path('api/health-check/', core_views.health_check, name='health-check'),
+
+    # path('api/', include('rest_framework_tus.urls', namespace='rest_framework_tus')),
+
     path('api/schema/', SpectacularAPIView.as_view(), name='api-schema'),
-
-    path('api/', include('rest_framework_tus.urls', namespace='rest_framework_tus')),
-
     path(
         'api/docs/',
         SpectacularSwaggerView.as_view(url_name='api-schema'),
         name='api-docs',
     ),
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/login/', user_views.CustomTokenObtainPairView.as_view(), name='user_login'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
-    path('api/user/', include('user.urls')),
-    path('api/recipe/', include('recipe.urls')),
-    path('api/job-managers/', include('job_manager.urls')),
-    path('api/customer-manager/', include('customer_manager.urls')),
+    # path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    # path('api/login/', user_views.CustomTokenObtainPairView.as_view(), name='user_login'),
+    # path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    # path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
+    # path('api/user/', include('user.urls')),
+    # path('api/recipe/', include('recipe.urls')),
+    # path('api/job-managers/', include('job_manager.urls')),
+    # path('api/customer-manager/', include('customer_manager.urls')),
     path('api/email-manager/', include('email_manager.urls')),
 ]
 

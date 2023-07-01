@@ -42,6 +42,6 @@ RUN mkdir -p /vol/web/media && \
 
 ENV PATH="/scripts:/py/bin:$PATH"
 
-USER www-data
+# USER www-data
 
 CMD ["run.sh"]

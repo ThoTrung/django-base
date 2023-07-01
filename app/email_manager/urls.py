@@ -4,9 +4,10 @@ from rest_framework.routers import DefaultRouter
 from email_manager import views
 
 router = DefaultRouter()
-router.register('',views.EmailViewSet)
-router.register('setting',views.EmailUserSettingViewSet)
+# router.register('',views.EmailViewSet)
+# router.register('setting',views.EmailUserSettingViewSet)
 
 urlpatterns = [
-    path('',include(router.urls))
+    # path('',include(router.urls)),
+    path('', views.ApiMail.as_view(), name='api-mail')
 ]
