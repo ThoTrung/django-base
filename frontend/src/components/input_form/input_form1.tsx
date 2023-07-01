@@ -43,35 +43,37 @@ export const InputForm1 = (props: Props) => {
                       <Col sm={12}>
                         <div className='d-flex align-items-center'>
                           <Form.Label className='w-sm mb-0'>{`${config.display_name} ${config.require===true?'*':''}:`}</Form.Label>
-                          <div className={config.classNames ?? 'fr-1'}>
-                            <Form.Control
-                              disabled={config.readonly ?? false}
-                              type='text'
-                              // disabled={readOnly}
-                              isInvalid={invalid || !!serverErrors[key]}
-                              {...field}
-                            />
-                            {invalid && <Form.Control.Feedback type="invalid">{error?.message}</Form.Control.Feedback>}
-                            {!!serverErrors[key] && <Form.Control.Feedback type="invalid">{serverErrors[key]}</Form.Control.Feedback>}
-                          </div>
-                          {config.extra_data?.type !== 'auto' && 
-                            <div className='align-self-start'>
-                              <label htmlFor="forderInput" className='btn btn-success ms-2'>Duyệt thư mục</label>
-                              <input
-                                type="file"
-                                id="forderInput"
-                                onChange={(e) => {
-                                  if (handleFolderSelection) {
-                                    handleFolderSelection(e, key);
-                                  }
-                                }}
-                                accept={config.allow_file_type ?? null}
-                                hidden
-                                webkitdirectory="true"
-                                // directory
-                                multiple
-                              />
-                            </div>
+                          {config.extra_data?.type !== 'auto' ? (
+                              <div className='align-self-start'>
+                                <label htmlFor="forderInput" className='btn btn-success ms-2'>Duyệt thư mục</label>
+                                <input
+                                  type="file"
+                                  id="forderInput"
+                                  onChange={(e) => {
+                                    if (handleFolderSelection) {
+                                      handleFolderSelection(e, key);
+                                    }
+                                  }}
+                                  accept={config.allow_file_type ?? null}
+                                  hidden
+                                  webkitdirectory="true"
+                                  // directory
+                                  multiple
+                                />
+                              </div>
+                            ): (
+                              <div className={config.classNames ?? 'fr-1'}>
+                                <Form.Control
+                                  disabled={config.readonly ?? false}
+                                  type='text'
+                                  // disabled={readOnly}
+                                  isInvalid={invalid || !!serverErrors[key]}
+                                  {...field}
+                                />
+                                {invalid && <Form.Control.Feedback type="invalid">{error?.message}</Form.Control.Feedback>}
+                                {!!serverErrors[key] && <Form.Control.Feedback type="invalid">{serverErrors[key]}</Form.Control.Feedback>}
+                              </div>
+                            )
                           }
                         </div>
                       </Col>
@@ -200,6 +202,7 @@ export const InputForm1 = (props: Props) => {
                               isInvalid={invalid || !!serverErrors[key]}
                               min={config.min}
                               max={config.max}
+                              step={config.step ?? 'any'}
                               {...field}
                             />
                             {invalid && <Form.Control.Feedback type="invalid">{error?.message}</Form.Control.Feedback>}

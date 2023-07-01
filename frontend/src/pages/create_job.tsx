@@ -1,4 +1,4 @@
-import { Row, Col, ListGroup, Button, Modal, Form } from '@blueupcode/components'
+import { Row, Col, ListGroup, Button, Modal, Form, useTheme } from '@blueupcode/components'
 import React, { useEffect } from 'react';
 import type { ExtendedNextPage } from '@blueupcode/components/types'
 import withAuth from 'components/auth/withAuth'
@@ -40,51 +40,51 @@ import { InputForm1 } from 'components/input_form/input_form1';
 const configData = {
 	folder_path: {
     type: 'file',
-		display_name: 'Đường dẫn *:',
+		display_name: 'Đường dẫn *',
     validate: yup.string().required('Bạn cần chọn đường thư mục để upload ảnh'),
-    default_value: '',
+    default_value: 'manual',
     readonly: true,
     allow_file_type: ".jpg, .png, .psd",
     version: 1,
 	},
 	name: {
-		display_name: 'Tên Job *:',
+		display_name: 'Tên Job *',
     validate: yup.string().required('Bạn cần nhập tên job'),
     default_value: '',
 	},
 	customer: {
     type: 'select',
     selected_list: 'customers',
-		display_name: 'Tên KH *:',
+		display_name: 'Tên KH *',
     validate: yup.string().required('Bạn cần chọn khách hàng'),
     default_value: '',
 	},
 	file_number: {
     type: 'number',
-		display_name: 'Số lượng file *:',
+		display_name: 'Số lượng file *',
     validate: yup.number().required('Bạn cần chọn số lượng file'),
     default_value: 0,
     readonly: true,
 	},
 	expose: {
-		display_name: 'Số expose *:',
+		display_name: 'Số expose *',
     validate: yup.string().required('Bạn cần nhập số expose'),
     default_value: '',
 	},
 	style: {
     type: 'textarea',
-		display_name: 'Style cố định *:',
+		display_name: 'Style cố định *',
     validate: yup.string().required('Bạn cần nhập style cố định'),
     default_value: '',
 	},
 	note: {
     type: 'textarea',
-		display_name: 'Chú ý:',
+		display_name: 'Chú ý',
     default_value: '',
 	},
 	deadline: {
     type: 'timepicker',
-		display_name: 'Deadline:',
+		display_name: 'Deadline',
     default_value: '',
     classNames: 'w-md',
 	},
@@ -92,18 +92,18 @@ const configData = {
     type: 'select',
     selected_list: 'number_sub_job',
     default_value: 1,
-		display_name: 'Số Job chia:',
+		display_name: 'Số Job chia',
     classNames: 'w-md',
 	},
 	editor: {
     type: 'select',
     selected_list: 'users',
-		display_name: 'Editor:',
+		display_name: 'Editor',
     default_value: '',
 	},
 	customer_price: {
     type: 'number',
-		display_name: 'Giá KH:',
+		display_name: 'Giá KH',
     default_value: 0,
     classNames: 'w-md',
     post_display: 'USD',
@@ -111,7 +111,7 @@ const configData = {
 	},
 	editor_price: {
     type: 'number',
-		display_name: 'Giá editor:',
+		display_name: 'Giá editor',
     default_value: 0,
     classNames: 'w-md',
     post_display: 'VNĐ',
@@ -140,6 +140,7 @@ const CreateJobPage: ExtendedNextPage<ICreateJobProps> = (props) => {
   const [serverErrors, setServerErrors] = React.useState<any>({});
   const [fileGUIDs, setFileGUIDs] = React.useState<string[]>([]);
   const [isRetry, setIsRetry] = React.useState<boolean>(false);
+  const { resolvedTheme: theme, setTheme } = useTheme()
 
   const uppyTmp = new Uppy({
     id: 'create_job_uppy',
@@ -230,7 +231,7 @@ const CreateJobPage: ExtendedNextPage<ICreateJobProps> = (props) => {
       dispatch(AShowLoading());
       const payload={}
       Object.keys(configData).forEach(key => {
-        payload[key] = formData[key];
+        payload[key] = formData[key]??'';
       });
       payload['source'] = source;
 
@@ -270,6 +271,8 @@ const CreateJobPage: ExtendedNextPage<ICreateJobProps> = (props) => {
       const swalTitle = 'Tạo Job thành công'
       if (isSuccessRequest(res)) {
         swalSuccess(swalTitle);
+        uppy.cancelAll();
+        reset(defaultValue);
       } else { // Error: 4xx
         setServerErrors(res.data);
       }
@@ -285,13 +288,15 @@ const CreateJobPage: ExtendedNextPage<ICreateJobProps> = (props) => {
 
   const handleFolderSelection = (event: React.ChangeEvent<HTMLInputElement>, key: string) => {
     const files = event.target.files;
+    console.log(files);
     const acceptedFiles = [];
     uppy.cancelAll();
-    let fileGeneratedIDsTmp:string[] = [];
+    // let fileGeneratedIDsTmp:string[] = [];
     if (files && files.length > 0) {
       // Filter file
       for (let i = 0; i < files.length; ++i) {
         const file = files[i];
+        if (file.webkitRelativePath.split('/').length === 2 && !file.webkitRelativePath.includes('.DS_Store')) { 
         // if (ALLOW_FILE_TYPES.includes(file.type)) {
           acceptedFiles.push(file);
           uppy.addFile({
@@ -300,9 +305,10 @@ const CreateJobPage: ExtendedNextPage<ICreateJobProps> = (props) => {
             type: file.type,
             data: file,
           });
-        // }
+        }
       }
       setValue('folder_path', files[0].webkitRelativePath.split('/')[0]);
+      setValue('name', files[0].webkitRelativePath.split('/')[0]);
     }
     if (acceptedFiles.length > 0) {
       setValue('file_number', acceptedFiles.length);
@@ -338,6 +344,20 @@ const CreateJobPage: ExtendedNextPage<ICreateJobProps> = (props) => {
             <Dashboard
               uppy={uppy}
               hideUploadButton={true}
+              hideRetryButton={true}
+              hidePauseResumeButton={true}
+              hideCancelButton={true}
+              hideProgressAfterFinish={true}
+              showRemoveButtonAfterComplete={false}
+              singleFileFullScreen={false}
+              disableThumbnailGenerator={true}
+              theme={theme === 'dark' ? 'dark' : 'light'}
+              locale={{
+                strings: {
+                  poweredBy: '',
+                  dropPasteFiles: '',
+                }
+              }}
               plugins={["DragDrop"]}
               width='100%'
               {...props}
